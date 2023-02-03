@@ -1,0 +1,2 @@
+format:
+	poetry run black .
