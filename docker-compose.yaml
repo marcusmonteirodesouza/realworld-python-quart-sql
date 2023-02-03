@@ -1,0 +1,42 @@
+version: "3.9"
+services:
+  #  web:
+  #    build: .
+  #    ports:
+  #      - "8080:8080"
+  #    depends_on:
+  #      db:
+  #        condition: service_healthy
+  #    environment:
+  #      - DB_HOST=${DB_HOST}
+  #      - DB_PORT=${DB_PORT}
+  #      - DB_USER=${DB_USER}
+  #      - DB_PASSWORD=${DB_PASSWORD}
+  #      - DB_NAME=${DB_NAME}
+  #      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+  #      - JWT_ISSUER=${JWT_ISSUER}
+  db:
+    image: "postgres:14.6-alpine"
+    user: "501"
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PORT=${DB_PORT}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  flyway:
+    image: "flyway/flyway"
+    command: -url=jdbc:postgresql://db:${DB_PORT}/${DB_NAME} -user=${DB_USER} -password=${DB_PASSWORD} migrate
+    volumes:
+      - ./flyway/sql:/flyway/sql
+    depends_on:
+      db:
+        condition: service_healthy
