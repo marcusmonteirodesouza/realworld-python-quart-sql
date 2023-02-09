@@ -19,8 +19,6 @@ class UsersService:
 
             record = await acur.fetchone()
 
-            await self._aconn.commit()
-
             user = User(
                 _id=record[0],
                 username=username,

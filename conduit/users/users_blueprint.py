@@ -1,42 +1,38 @@
-from quart import Blueprint, request, current_app
-from .user import User
+from http import HTTPStatus
+from quart import Blueprint, current_app
+from quart_schema import validate_request, validate_response
+from .register_user_request import RegisterUserRequest
+from .user_response import UserResponse, UserResponseUser
 
 
-class UsersBlueprint:
-    @property
-    def blueprint(self):
-        bp = Blueprint("users", __name__)
+users_blueprint = Blueprint("users", __name__)
 
-        @bp.route("/users", methods=["POST"])
-        async def register_user():
-            request_data = await request.get_json()
 
-            current_app.logger.info(f"received register user request {request_data}...")
+@users_blueprint.post(rule="/users")
+@validate_request(model_class=RegisterUserRequest)
+@validate_response(model_class=UserResponse, status_code=HTTPStatus.CREATED)
+async def register_user(data: RegisterUserRequest) -> (UserResponse, int):
+    current_app.logger.info(f"received register user request {data}...")
 
-            user_data = request_data["user"]
+    user = await current_app.users_service.register_user(
+        username=data.user.username,
+        email=data.user.email,
+        password=data.user.password,
+    )
 
-            user = await current_app.users_service.register_user(
-                username=user_data["username"],
-                email=user_data["email"],
-                password=user_data["password"],
+    current_app.logger.info(f"user registered! {user}")
+
+    token = "token"
+
+    return (
+        UserResponse(
+            UserResponseUser(
+                email=user.email,
+                token=token,
+                username=user.username,
+                bio=user.bio,
+                image=user.image,
             )
-
-            current_app.logger.info(f"user registered! {user}")
-
-            token = "token"
-
-            return self._to_user_dto(user=user, token=token)
-
-        return bp
-
-    @staticmethod
-    def _to_user_dto(user: User, token: str):
-        return {
-            "user": {
-                "email": user.email,
-                "token": token,
-                "username": user.username,
-                "bio": user.bio,
-                "image": user.image,
-            }
-        }
+        ),
+        HTTPStatus.CREATED,
+    )
