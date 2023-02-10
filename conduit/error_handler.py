@@ -23,6 +23,13 @@ def ErrorHandler(app: Quart):
             HTTPStatus.BAD_REQUEST,
         )
 
+    @app.errorhandler(ValueError)
+    def handle_value_error(e: ValueError):
+        return (
+            _ErrorResponse(_ErrorResponseBody([str(e)])),
+            HTTPStatus.BAD_REQUEST,
+        )
+
     @app.errorhandler(Exception)
     def handle_exception(e: Exception):
         app.logger.error(e)
