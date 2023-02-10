@@ -22,7 +22,7 @@ async def register_user(data: RegisterUserRequest) -> (UserResponse, int):
 
     current_app.logger.info(f"user registered! {user}")
 
-    token = "token"
+    token = current_app.jwt_service.encode(user=user)
 
     return (
         UserResponse(

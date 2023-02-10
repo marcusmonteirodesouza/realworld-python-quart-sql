@@ -497,6 +497,24 @@ files = [
 ]
 
 [[package]]
+name = "pyjwt"
+version = "2.6.0"
+description = "JSON Web Token implementation in Python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "PyJWT-2.6.0-py3-none-any.whl", hash = "sha256:d83c3d892a77bbb74d3e1a2cfa90afaadb60945205d1095d9221f04466f64c14"},
+    {file = "PyJWT-2.6.0.tar.gz", hash = "sha256:69285c7e31fc44f68a1feb309e948e0df53259d579295e6cfe2b1792329f05fd"},
+]
+
+[package.extras]
+crypto = ["cryptography (>=3.4.0)"]
+dev = ["coverage[toml] (==5.0.4)", "cryptography (>=3.4.0)", "pre-commit", "pytest (>=6.0.0,<7.0.0)", "sphinx (>=4.5.0,<5.0.0)", "sphinx-rtd-theme", "zope.interface"]
+docs = ["sphinx (>=4.5.0,<5.0.0)", "sphinx-rtd-theme", "zope.interface"]
+tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
+
+[[package]]
 name = "python-dotenv"
 version = "0.21.1"
 description = "Read key-value pairs from a .env file and set them as environment variables"
@@ -649,4 +667,4 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "a2677655ed20fbef93b57d06a5cd03dfba2b03c03e527493d868f9535d27be0a"
+content-hash = "2aae74dd9f1c2c927bd7f311b98286b1151b79e4b8686fcc526f5e44b28820a7"

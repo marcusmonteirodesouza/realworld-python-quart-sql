@@ -28,7 +28,7 @@ class UsersService:
             record = await acur.fetchone()
 
             user = User(
-                _id=record[0],
+                id=record[0],
                 username=username,
                 email=email,
                 bio=None,
@@ -53,7 +53,7 @@ class UsersService:
                 return
 
             user = User(
-                _id=record[0],
+                id=record[0],
                 username=username,
                 email=record[1],
                 bio=record[2],
@@ -78,7 +78,7 @@ class UsersService:
                 return
 
             user = User(
-                _id=record[0],
+                id=record[0],
                 username=record[1],
                 email=email,
                 bio=record[2],

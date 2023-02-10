@@ -5,7 +5,7 @@ from uuid import UUID
 
 @dataclass
 class User:
-    _id: UUID
+    id: UUID
     username: str
     email: str
     bio: Optional[str]
