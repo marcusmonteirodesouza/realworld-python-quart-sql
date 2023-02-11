@@ -2,10 +2,10 @@ format:
 	poetry run black .
 
 db-up:
-	docker-compose up flyway --detach --wait
+	docker compose up flyway --detach --wait
 
-db-down:
-	docker-compose down flyway
+down:
+	docker compose down
 
 run:
 	poetry run dotenv run -- python -m conduit

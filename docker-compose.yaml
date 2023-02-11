@@ -13,11 +13,8 @@ services:
   #      - JWT_ISSUER=${JWT_ISSUER}
   db:
     image: "postgres:14.6-alpine"
-    user: "501"
     ports:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PORT=${DATABASE_PORT}
       - POSTGRES_USER=${DATABASE_USER}

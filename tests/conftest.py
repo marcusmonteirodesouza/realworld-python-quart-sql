@@ -13,7 +13,7 @@ def pytest_configure(config):
     This hook is called for every plugin and initial conftest
     file after command line options have been parsed.
     """
-    subprocess.run(["make", "db-up"])
+    subprocess.run(["make", "db-up"], check=True)
 
 
 @pytest.fixture(scope="session", autouse=True)
