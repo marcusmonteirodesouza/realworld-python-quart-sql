@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Marcus Vinicius Monteiro de Souza <marcusmonteirodesouza@gmail.com>"]
 readme = "README.md"
-packages = [{include = "realworld_python_flask_sql"}]
+packages = [{include = "conduit"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"

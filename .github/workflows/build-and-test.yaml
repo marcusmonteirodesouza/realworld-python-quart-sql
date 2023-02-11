@@ -1,0 +1,19 @@
+name: Build and Test
+run-name: Build and Test
+on:
+  pull_request:
+  push:
+    branches:
+      - "main"
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - uses: abatilo/actions-poetry@v2
+      - run: make db-up
+      - run: make test
