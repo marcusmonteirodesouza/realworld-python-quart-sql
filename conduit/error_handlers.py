@@ -4,6 +4,8 @@ from typing import List
 from quart import Quart
 from werkzeug.exceptions import HTTPException
 
+from conduit.errors import AlreadyExistsException
+
 
 @dataclass
 class _ErrorResponseBody:
@@ -16,6 +18,15 @@ class _ErrorResponse:
 
 
 def add_error_handlers(app: Quart):
+    @app.errorhandler(AlreadyExistsException)
+    def handle_value_error(e: AlreadyExistsException):
+        app.logger.error(e)
+
+        return (
+            _ErrorResponse(_ErrorResponseBody([str(e)])),
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
     @app.errorhandler(ValueError)
     def handle_value_error(e: ValueError):
         app.logger.error(e)
