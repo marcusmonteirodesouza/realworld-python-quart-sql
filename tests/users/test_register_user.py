@@ -51,7 +51,7 @@ async def test_when_username_not_sent_should_return_400(app, faker):
     response_data = await response.json
 
     assert (
-        response_data["errors"]["body"][0]
+        response_data["exceptions"]["body"][0]
         == "The browser (or proxy) sent a request that this server could not understand."
     )
 
@@ -76,7 +76,7 @@ async def test_when_username_is_taken_should_return_422(app, faker, user):
 
     response_data = await response.json
 
-    assert response_data["errors"]["body"][0] == "username is taken"
+    assert response_data["exceptions"]["body"][0] == "username is taken"
 
 
 @pytest.mark.asyncio
@@ -99,7 +99,7 @@ async def test_when_email_not_sent_should_return_400(app, faker):
     response_data = await response.json
 
     assert (
-        response_data["errors"]["body"][0]
+        response_data["exceptions"]["body"][0]
         == "The browser (or proxy) sent a request that this server could not understand."
     )
 
@@ -125,7 +125,8 @@ async def test_when_invalid_email_should_return_400(app, faker):
     response_data = await response.json
 
     assert (
-        response_data["errors"]["body"][0] == f'invalid email {data["user"]["email"]}'
+        response_data["exceptions"]["body"][0]
+        == f'invalid email {data["user"]["email"]}'
     )
 
 
@@ -149,7 +150,7 @@ async def test_when_email_is_taken_should_return_422(app, faker, user):
 
     response_data = await response.json
 
-    assert response_data["errors"]["body"][0] == "email is taken"
+    assert response_data["exceptions"]["body"][0] == "email is taken"
 
 
 @pytest.mark.asyncio
@@ -173,7 +174,7 @@ async def test_when_password_length_less_than_8_should_return_400(app, faker):
     response_data = await response.json
 
     assert (
-        response_data["errors"]["body"][0]
+        response_data["exceptions"]["body"][0]
         == "password length must be greater than or equal to 8"
     )
 
@@ -199,6 +200,6 @@ async def test_when_password_length_greater_than_64_should_return_400(app, faker
     response_data = await response.json
 
     assert (
-        response_data["errors"]["body"][0]
+        response_data["exceptions"]["body"][0]
         == "password length must be less than or equal to 64"
     )
