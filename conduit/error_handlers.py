@@ -32,7 +32,7 @@ def add_error_handlers(app: Quart):
 
         return (
             _ErrorResponse(_ErrorResponseBody(["unauthorized"])),
-            HTTPStatus.BAD_REQUEST,
+            HTTPStatus.UNAUTHORIZED,
         )
 
     @app.errorhandler(ValueError)
