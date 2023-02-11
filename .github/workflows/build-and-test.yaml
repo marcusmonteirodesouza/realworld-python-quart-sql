@@ -15,5 +15,4 @@ jobs:
         with:
           python-version: "3.11"
       - uses: abatilo/actions-poetry@v2
-      - run: make db-up
       - run: make test
