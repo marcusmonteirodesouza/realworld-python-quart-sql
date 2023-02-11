@@ -3,7 +3,7 @@ import random
 import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
-from .users import User, UserUser
+from .users import User
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -47,11 +47,10 @@ async def user(app, faker):
     created_user = response_data["user"]
 
     yield User(
-        UserUser(
-            email=created_user["email"],
-            username=created_user["username"],
-            token=created_user["token"],
-            bio=created_user["bio"],
-            image=created_user["image"],
-        )
+        email=created_user["email"],
+        username=created_user["username"],
+        token=created_user["token"],
+        bio=created_user["bio"],
+        image=created_user["image"],
+        password=data["user"]["password"],
     )

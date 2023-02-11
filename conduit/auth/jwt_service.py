@@ -11,7 +11,7 @@ class JWTService:
         self._algorithm = "HS256"
 
     def encode(self, user: User) -> str:
-        iat = datetime.datetime.utcnow()
+        iat = datetime.datetime.now(tz=datetime.timezone.utc)
         exp = iat + datetime.timedelta(seconds=self._jwt_valid_for_seconds)
 
         payload = {

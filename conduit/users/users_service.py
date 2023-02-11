@@ -2,7 +2,7 @@ import psycopg
 import validators
 from typing import Optional
 from .user import User
-from ..exceptions import AlreadyExistsException, NotFoundException
+from ..exceptions import AlreadyExistsException
 
 
 class UsersService:
@@ -108,7 +108,7 @@ class UsersService:
         existing_user = await self.get_user_by_username(username=username)
 
         if existing_user:
-            raise AlreadyExistsException(f"username {username} is taken")
+            raise AlreadyExistsException(f"username is taken")
 
     async def _validate_email(self, email: str):
         if not validators.email(email):
@@ -117,7 +117,7 @@ class UsersService:
         existing_user = await self.get_user_by_email(email=email)
 
         if existing_user:
-            raise AlreadyExistsException(f"email {email} is taken")
+            raise AlreadyExistsException(f"email is taken")
 
     @staticmethod
     def _validate_password(password: str):

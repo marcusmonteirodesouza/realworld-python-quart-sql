@@ -3,9 +3,7 @@ from http import HTTPStatus
 from typing import List
 from quart import Quart
 from werkzeug.exceptions import HTTPException
-
-from conduit.exceptions import AlreadyExistsException
-from conduit.exceptions.unauthorized_exception import UnauthorizedException
+from .exceptions import AlreadyExistsException, UnauthorizedException
 
 
 @dataclass

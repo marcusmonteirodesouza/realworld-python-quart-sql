@@ -1,11 +1,10 @@
 from http import HTTPStatus
 from quart import Blueprint, current_app
 from quart_schema import validate_request, validate_response
-
 from .login_request import LoginRequest
 from .register_user_request import RegisterUserRequest
 from .user_response import UserResponse, UserResponseUser
-from ..exceptions.unauthorized_exception import UnauthorizedException
+from ..exceptions import UnauthorizedException
 
 users_blueprint = Blueprint("users", __name__)
 
