@@ -3,7 +3,7 @@ from quart import Quart
 from quart_schema import QuartSchema
 from .auth import JWTService
 from .users import UsersService, users_blueprint
-from .error_handler import ErrorHandler
+from .error_handlers import add_error_handlers
 from .config import config
 
 app = Quart(__name__)
@@ -12,7 +12,7 @@ QuartSchema(app=app, convert_casing=True)
 
 app.config.from_object(config)
 
-ErrorHandler(app=app)
+add_error_handlers(app=app)
 
 
 @app.before_serving

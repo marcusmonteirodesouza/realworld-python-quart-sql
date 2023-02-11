@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from http import HTTPStatus
 from typing import List
 from quart import Quart
-from quart_schema import RequestSchemaValidationError
+from werkzeug.exceptions import HTTPException
 
 
 @dataclass
@@ -15,20 +15,24 @@ class _ErrorResponse:
     errors: _ErrorResponseBody
 
 
-def ErrorHandler(app: Quart):
-    @app.errorhandler(RequestSchemaValidationError)
-    def handle_request_validation_error(e: RequestSchemaValidationError):
-        return (
-            _ErrorResponse(_ErrorResponseBody([e.validation_error.json()])),
-            HTTPStatus.BAD_REQUEST,
-        )
-
+def add_error_handlers(app: Quart):
     @app.errorhandler(ValueError)
     def handle_value_error(e: ValueError):
+        app.logger.error(e)
+
         return (
             _ErrorResponse(_ErrorResponseBody([str(e)])),
             HTTPStatus.BAD_REQUEST,
         )
+
+    @app.errorhandler(HTTPException)
+    def handle_http_exception(e: HTTPException):
+        try:
+            app.logger.error(e.validation_error.json())
+        except AttributeError:
+            app.logger.error(e)
+
+        return _ErrorResponse(_ErrorResponseBody([e.description])), e.code
 
     @app.errorhandler(Exception)
     def handle_exception(e: Exception):
