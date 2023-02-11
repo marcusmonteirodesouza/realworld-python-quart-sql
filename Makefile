@@ -11,7 +11,7 @@ run:
 	poetry run dotenv run -- python -m conduit
 
 test:
-	poetry run pytest
+	make db-up && poetry run pytest
 
 api-test:
 	poetry run python api_test.py

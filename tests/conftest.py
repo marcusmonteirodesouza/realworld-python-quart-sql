@@ -1,19 +1,9 @@
 import json
 import random
-import subprocess
 import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
 from .users import User, UserUser
-
-
-def pytest_configure(config):
-    """
-    Allows plugins and conftest files to perform initial configuration.
-    This hook is called for every plugin and initial conftest
-    file after command line options have been parsed.
-    """
-    subprocess.run(["make", "db-up"], check=True)
 
 
 @pytest.fixture(scope="session", autouse=True)
