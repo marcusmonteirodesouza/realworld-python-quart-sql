@@ -1,3 +1,6 @@
+pre-commit:
+	poetry run pre-commit install
+
 format:
 	poetry run black .
 
