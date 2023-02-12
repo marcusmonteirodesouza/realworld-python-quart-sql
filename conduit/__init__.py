@@ -1,19 +1,20 @@
 import psycopg
 from quart import Quart
-from quart_jwt_extended import JWTManager, verify_jwt_in_request
+from quart_jwt_extended import JWTManager
 from quart_schema import QuartSchema
 from .users import UsersService, users_blueprint
-from .error_handlers import add_error_handlers
+from .error_handlers import add_error_handlers, add_jwt_manager_error_loaders
 from .config import config
 
 app = Quart(__name__)
 
-JWTManager(app=app)
+jwt_manager = JWTManager(app=app)
 
-verify_jwt_in_request()
 QuartSchema(app=app, convert_casing=True)
 
 app.config.from_object(config)
+
+add_jwt_manager_error_loaders(app=app, jwt_manager=jwt_manager)
 
 add_error_handlers(app=app)
 

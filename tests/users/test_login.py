@@ -7,7 +7,7 @@ import jwt
 
 
 @pytest.mark.asyncio
-async def test_when_valid_request_should_return_201(app, faker, user):
+async def test_when_valid_request_should_return_200(app, faker, user):
     client = app.test_client()
 
     data = {

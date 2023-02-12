@@ -11,6 +11,7 @@ class _Config:
     )
     JWT_IDENTITY_CLAIM = "sub"
     JWT_ENCODE_ISSUER = os.environ["JWT_ENCODE_ISSUER"]
+    JWT_HEADER_NAME = "Authorization"
     JWT_HEADER_TYPE = "Token"
     DEBUG = os.environ.get("DEBUG") or False
 

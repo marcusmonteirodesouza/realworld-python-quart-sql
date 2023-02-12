@@ -1,10 +1,10 @@
 from http import HTTPStatus
-from quart import Blueprint, current_app
+from quart import Blueprint, current_app, request
 from quart_schema import validate_request, validate_response
 from .login_request import LoginRequest
 from .register_user_request import RegisterUserRequest
 from .user_response import UserResponse, UserResponseUser
-from ..auth import create_access_token, jwt_required, get_jwt_identity
+from ..auth import create_access_token, jwt_required, get_jwt_identity, get_jwt_token
 from ..exceptions import UnauthorizedException, NotFoundException
 
 users_blueprint = Blueprint("users", __name__)
@@ -86,7 +86,7 @@ async def get_current_user() -> (UserResponse, int):
     if not user:
         raise NotFoundException(f"user_id {user_id} not found")
 
-    token = create_access_token(user=user)
+    token = get_jwt_token(request=request)
 
     return (
         UserResponse(
