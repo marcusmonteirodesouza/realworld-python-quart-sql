@@ -3,14 +3,10 @@ from typing import Optional
 
 
 @dataclass
-class UserUser:
+class User:
     email: str
     token: str
     username: str
     bio: Optional[str]
     image: Optional[str]
-
-
-@dataclass
-class User:
-    user: UserUser
+    password: str

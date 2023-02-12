@@ -1,8 +1,14 @@
+pre-commit:
+	poetry run pre-commit install
+
 format:
 	poetry run black .
 
 db-up:
 	docker compose up flyway --detach --wait
+
+up:
+	docker compose up -d --wait
 
 down:
 	docker compose down

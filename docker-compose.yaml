@@ -1,16 +1,21 @@
 version: "3.9"
 services:
-  #  web:
-  #    build: .
-  #    ports:
-  #      - "${PORT}:${PORT}"
-  #    depends_on:
-  #      db:
-  #        condition: service_healthy
-  #    environment:
-  #      - DATABASE_URI=${DATABASE_URI}
-  #      - SECRET_KEY=${SECRET_KEY}
-  #      - JWT_ISSUER=${JWT_ISSUER}
+  app:
+    build:
+      context: .
+      args:
+        PORT: ${PORT}
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - PORT=${PORT}
+      - DATABASE_URI=postgres://${DATABASE_USER}:${DATABASE_PASSWORD}@db:${DATABASE_PORT}/${DATABASE_NAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_VALID_FOR_SECONDS=${JWT_VALID_FOR_SECONDS}
   db:
     image: "postgres:14.6-alpine"
     ports:

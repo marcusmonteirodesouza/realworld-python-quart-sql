@@ -2,7 +2,7 @@ import psycopg
 import validators
 from typing import Optional
 from .user import User
-from ..errors import AlreadyExistsException
+from ..exceptions import AlreadyExistsException
 
 
 class UsersService:
@@ -41,10 +41,10 @@ class UsersService:
     async def get_user_by_username(self, username: str) -> Optional[User]:
         async with self._aconn.cursor() as acur:
             get_user_by_username_query = f"""
-                        SELECT id, email, bio, image
-                        FROM {self._users_table}
-                        WHERE username = %s;
-                    """
+                SELECT id, email, bio, image
+                FROM {self._users_table}
+                WHERE username = %s;
+            """
 
             await acur.execute(get_user_by_username_query, (username,))
 
@@ -66,10 +66,10 @@ class UsersService:
     async def get_user_by_email(self, email: str) -> Optional[User]:
         async with self._aconn.cursor() as acur:
             get_user_by_email_query = f"""
-                        SELECT id, username, bio, image
-                        FROM {self._users_table}
-                        WHERE email = %s;
-                    """
+                SELECT id, username, bio, image
+                FROM {self._users_table}
+                WHERE email = %s;
+            """
 
             await acur.execute(get_user_by_email_query, (email,))
 
@@ -87,6 +87,22 @@ class UsersService:
             )
 
             return user
+
+    async def verify_password_by_email(self, email: str, password: str) -> bool:
+        async with self._aconn.cursor() as acur:
+            verify_password_by_email_query = f"""
+                SELECT EXISTS(
+                    SELECT 1 FROM {self._users_table}
+                    WHERE email = %s
+                    AND password_hash = crypt(%s, password_hash)
+                );
+            """
+
+            await acur.execute(verify_password_by_email_query, (email, password))
+
+            record = await acur.fetchone()
+
+            return record[0]
 
     async def _validate_username(self, username: str):
         existing_user = await self.get_user_by_username(username=username)

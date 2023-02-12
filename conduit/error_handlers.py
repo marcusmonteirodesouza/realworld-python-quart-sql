@@ -3,8 +3,7 @@ from http import HTTPStatus
 from typing import List
 from quart import Quart
 from werkzeug.exceptions import HTTPException
-
-from conduit.errors import AlreadyExistsException
+from .exceptions import AlreadyExistsException, UnauthorizedException
 
 
 @dataclass
@@ -25,6 +24,15 @@ def add_error_handlers(app: Quart):
         return (
             _ErrorResponse(_ErrorResponseBody([str(e)])),
             HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    @app.errorhandler(UnauthorizedException)
+    def handle_value_error(e: UnauthorizedException):
+        app.logger.error(e)
+
+        return (
+            _ErrorResponse(_ErrorResponseBody(["unauthorized"])),
+            HTTPStatus.UNAUTHORIZED,
         )
 
     @app.errorhandler(ValueError)

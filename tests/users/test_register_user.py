@@ -1,9 +1,13 @@
+import datetime
 import json
+import os
+import uuid
 import pytest
+import jwt
 
 
 @pytest.mark.asyncio
-async def test_valid_request_should_return_201(app, faker):
+async def test_when_valid_request_should_return_201(app, faker):
     client = app.test_client()
 
     data = {
@@ -26,7 +30,17 @@ async def test_valid_request_should_return_201(app, faker):
 
     assert created_user["email"] == data["user"]["email"]
     assert created_user["username"] == data["user"]["username"]
-    assert created_user["token"]
+
+    decoded_token = jwt.decode(
+        jwt=created_user["token"], key=os.environ["SECRET_KEY"], algorithms="HS256"
+    )
+    iat = datetime.datetime.now(tz=datetime.timezone.utc)
+    exp = iat + datetime.timedelta(seconds=int(os.environ["JWT_VALID_FOR_SECONDS"]))
+    uuid.UUID(decoded_token["sub"])
+    assert decoded_token["iss"] == os.environ["JWT_ISSUER"]
+    assert decoded_token["iat"] == int(iat.timestamp())
+    assert decoded_token["exp"] == int(exp.timestamp())
+
     assert created_user["bio"] is None
     assert created_user["image"] is None
 
@@ -64,7 +78,7 @@ async def test_when_username_is_taken_should_return_422(app, faker, user):
         "user": {
             "email": faker.email(),
             "password": faker.password(),
-            "username": user.user.username,
+            "username": user.username,
         }
     }
 
@@ -76,7 +90,7 @@ async def test_when_username_is_taken_should_return_422(app, faker, user):
 
     response_data = await response.json
 
-    assert response_data["errors"]["body"][0] == "username is taken"
+    assert response_data["errors"]["body"][0] == f"username is taken"
 
 
 @pytest.mark.asyncio
@@ -135,7 +149,7 @@ async def test_when_email_is_taken_should_return_422(app, faker, user):
 
     data = {
         "user": {
-            "email": user.user.email,
+            "email": user.email,
             "password": faker.password(),
             "username": faker.user_name(),
         }
@@ -149,7 +163,7 @@ async def test_when_email_is_taken_should_return_422(app, faker, user):
 
     response_data = await response.json
 
-    assert response_data["errors"]["body"][0] == "email is taken"
+    assert response_data["errors"]["body"][0] == f"email is taken"
 
 
 @pytest.mark.asyncio
