@@ -1,13 +1,16 @@
 import psycopg
 from quart import Quart
+from quart_jwt_extended import JWTManager, verify_jwt_in_request
 from quart_schema import QuartSchema
-from .auth import JWTService
 from .users import UsersService, users_blueprint
 from .error_handlers import add_error_handlers
 from .config import config
 
 app = Quart(__name__)
 
+JWTManager(app=app)
+
+verify_jwt_in_request()
 QuartSchema(app=app, convert_casing=True)
 
 app.config.from_object(config)
@@ -19,12 +22,6 @@ add_error_handlers(app=app)
 async def startup():
     app.aconn = await psycopg.AsyncConnection.connect(
         app.config["DATABASE_URI"], autocommit=True
-    )
-
-    app.jwt_service = JWTService(
-        secret_key=app.config["SECRET_KEY"],
-        jwt_issuer=app.config["JWT_ISSUER"],
-        jwt_valid_for_seconds=app.config["JWT_VALID_FOR_SECONDS"],
     )
 
     app.users_service = UsersService(aconn=app.aconn)

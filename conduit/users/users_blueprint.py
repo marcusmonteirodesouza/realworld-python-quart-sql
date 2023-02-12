@@ -4,7 +4,8 @@ from quart_schema import validate_request, validate_response
 from .login_request import LoginRequest
 from .register_user_request import RegisterUserRequest
 from .user_response import UserResponse, UserResponseUser
-from ..exceptions import UnauthorizedException
+from ..auth import create_access_token, jwt_required, get_jwt_identity
+from ..exceptions import UnauthorizedException, NotFoundException
 
 users_blueprint = Blueprint("users", __name__)
 
@@ -25,7 +26,7 @@ async def register_user(data: RegisterUserRequest) -> (UserResponse, int):
 
     current_app.logger.info(f"user registered! {user}")
 
-    token = current_app.jwt_service.encode(user=user)
+    token = create_access_token(user=user)
 
     return (
         UserResponse(
@@ -59,7 +60,33 @@ async def login(data: LoginRequest) -> (UserResponse, int):
 
     current_app.logger.info(f"login successful! {user}")
 
-    token = current_app.jwt_service.encode(user=user)
+    token = create_access_token(user=user)
+
+    return (
+        UserResponse(
+            UserResponseUser(
+                email=user.email,
+                token=token,
+                username=user.username,
+                bio=user.bio,
+                image=user.image,
+            )
+        ),
+    )
+
+
+@users_blueprint.get(rule="/user")
+@jwt_required
+@validate_response(model_class=UserResponse)
+async def get_current_user() -> (UserResponse, int):
+    user_id = get_jwt_identity()
+
+    user = await current_app.users_service.get_user_by_id(user_id=user_id)
+
+    if not user:
+        raise NotFoundException(f"user_id {user_id} not found")
+
+    token = create_access_token(user=user)
 
     return (
         UserResponse(
