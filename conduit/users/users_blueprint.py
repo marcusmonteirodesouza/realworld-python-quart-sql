@@ -1,10 +1,11 @@
 from http import HTTPStatus
-from quart import Blueprint, current_app
+from quart import Blueprint, current_app, request
 from quart_schema import validate_request, validate_response
 from .login_request import LoginRequest
 from .register_user_request import RegisterUserRequest
 from .user_response import UserResponse, UserResponseUser
-from ..exceptions import UnauthorizedException
+from ..auth import create_access_token, jwt_required, get_jwt_identity, get_jwt_token
+from ..exceptions import UnauthorizedException, NotFoundException
 
 users_blueprint = Blueprint("users", __name__)
 
@@ -25,7 +26,7 @@ async def register_user(data: RegisterUserRequest) -> (UserResponse, int):
 
     current_app.logger.info(f"user registered! {user}")
 
-    token = current_app.jwt_service.encode(user=user)
+    token = create_access_token(user=user)
 
     return (
         UserResponse(
@@ -59,7 +60,33 @@ async def login(data: LoginRequest) -> (UserResponse, int):
 
     current_app.logger.info(f"login successful! {user}")
 
-    token = current_app.jwt_service.encode(user=user)
+    token = create_access_token(user=user)
+
+    return (
+        UserResponse(
+            UserResponseUser(
+                email=user.email,
+                token=token,
+                username=user.username,
+                bio=user.bio,
+                image=user.image,
+            )
+        ),
+    )
+
+
+@users_blueprint.get(rule="/user")
+@jwt_required
+@validate_response(model_class=UserResponse)
+async def get_current_user() -> (UserResponse, int):
+    username = get_jwt_identity()
+
+    user = await current_app.users_service.get_user_by_username(username=username)
+
+    if not user:
+        raise UnauthorizedException(f"username {username} not found")
+
+    token = get_jwt_token(request=request)
 
     return (
         UserResponse(

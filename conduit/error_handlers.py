@@ -1,7 +1,10 @@
+import dataclasses
+import json
 from dataclasses import dataclass
 from http import HTTPStatus
 from typing import List
-from quart import Quart
+from quart import Quart, Response
+from quart_jwt_extended import JWTManager
 from werkzeug.exceptions import HTTPException
 from .exceptions import AlreadyExistsException, UnauthorizedException
 
@@ -14,6 +17,24 @@ class _ErrorResponseBody:
 @dataclass
 class _ErrorResponse:
     errors: _ErrorResponseBody
+
+
+def add_jwt_manager_error_loaders(app: Quart, jwt_manager: JWTManager):
+    def unauthorized_callback(reason: str) -> Response:
+        app.logger.error(reason)
+
+        response = Response(
+            response=json.dumps(
+                dataclasses.asdict(_ErrorResponse(_ErrorResponseBody(["unauthorized"])))
+            ),
+            status=HTTPStatus.UNAUTHORIZED,
+            headers={"Content-Type": "application/json"},
+        )
+        return response
+
+    jwt_manager.invalid_token_loader(callback=unauthorized_callback)
+    jwt_manager.unauthorized_loader(callback=unauthorized_callback)
+    jwt_manager.expired_token_loader(callback=unauthorized_callback)
 
 
 def add_error_handlers(app: Quart):

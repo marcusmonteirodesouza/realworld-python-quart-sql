@@ -1,13 +1,12 @@
 import datetime
 import os
 import json
-import uuid
 import pytest
 import jwt
 
 
 @pytest.mark.asyncio
-async def test_when_valid_request_should_return_201(app, faker, user):
+async def test_when_valid_request_should_return_200(app, faker, user):
     client = app.test_client()
 
     data = {
@@ -36,9 +35,11 @@ async def test_when_valid_request_should_return_201(app, faker, user):
         jwt=logged_user["token"], key=os.environ["SECRET_KEY"], algorithms="HS256"
     )
     iat = datetime.datetime.now(tz=datetime.timezone.utc)
-    exp = iat + datetime.timedelta(seconds=int(os.environ["JWT_VALID_FOR_SECONDS"]))
-    uuid.UUID(decoded_token["sub"])
-    assert decoded_token["iss"] == os.environ["JWT_ISSUER"]
+    exp = iat + datetime.timedelta(
+        seconds=int(os.environ["JWT_ACCESS_TOKEN_EXPIRES_SECONDS"])
+    )
+    assert decoded_token["sub"] == logged_user["username"]
+    assert decoded_token["iss"] == os.environ["JWT_ENCODE_ISSUER"]
     assert decoded_token["iat"] == int(iat.timestamp())
     assert decoded_token["exp"] == int(exp.timestamp())
 
