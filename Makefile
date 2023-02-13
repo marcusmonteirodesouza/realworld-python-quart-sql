@@ -19,7 +19,7 @@ down:
 run:
 	poetry run dotenv run -- python -m conduit
 
-run-fresh:
+down-run:
 	make down && make db-up && make run
 
 test:

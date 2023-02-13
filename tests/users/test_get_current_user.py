@@ -18,8 +18,8 @@ async def test_when_valid_request_should_return_200(app, faker, user):
 
     current_user = response_data["user"]
 
-    assert current_user["email"] == user.email
     assert current_user["username"] == user.username
+    assert current_user["email"] == user.email
     assert current_user["token"] == user.token
     assert current_user["bio"] == user.bio
     assert current_user["image"] == user.image
