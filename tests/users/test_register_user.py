@@ -38,7 +38,7 @@ async def test_when_valid_request_should_return_201(app, faker):
     exp = iat + datetime.timedelta(
         seconds=int(os.environ["JWT_ACCESS_TOKEN_EXPIRES_SECONDS"])
     )
-    uuid.UUID(decoded_token["sub"])
+    assert decoded_token["sub"] == created_user["username"]
     assert decoded_token["iss"] == os.environ["JWT_ENCODE_ISSUER"]
     assert decoded_token["iat"] == int(iat.timestamp())
     assert decoded_token["exp"] == int(exp.timestamp())

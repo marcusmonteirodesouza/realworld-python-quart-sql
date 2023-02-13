@@ -23,6 +23,7 @@ pytest = "^7.2.1"
 pytest-asyncio = "^0.20.3"
 faker = "^16.8.1"
 pre-commit = "^3.0.4"
+pyjwt = "^2.6.0"
 
 [build-system]
 requires = ["poetry-core"]

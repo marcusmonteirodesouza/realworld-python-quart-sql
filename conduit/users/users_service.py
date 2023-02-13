@@ -1,5 +1,3 @@
-import uuid
-
 import psycopg
 import validators
 from typing import Optional
@@ -39,31 +37,6 @@ class UsersService:
                 email=email,
                 bio=None,
                 image=None,
-            )
-
-            return user
-
-    async def get_user_by_id(self, user_id: uuid.UUID) -> Optional[User]:
-        async with self._aconn.cursor() as acur:
-            get_user_by_id_query = f"""
-                SELECT username, email, bio, image
-                FROM {self._users_table}
-                WHERE id = %s;
-            """
-
-            await acur.execute(get_user_by_id_query, (user_id,))
-
-            record = await acur.fetchone()
-
-            if not record:
-                return
-
-            user = User(
-                id=user_id,
-                username=record[0],
-                email=record[1],
-                bio=record[2],
-                image=record[3],
             )
 
             return user

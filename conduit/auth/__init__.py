@@ -13,7 +13,7 @@ verify_jwt_in_request
 
 
 def create_access_token(user: User) -> str:
-    return _create_access_token(identity=str(user.id))
+    return _create_access_token(identity=str(user.username))
 
 
 def get_jwt_token(request: Request) -> str:

@@ -32,7 +32,9 @@ def add_jwt_manager_error_loaders(app: Quart, jwt_manager: JWTManager):
         )
         return response
 
+    jwt_manager.invalid_token_loader(callback=unauthorized_callback)
     jwt_manager.unauthorized_loader(callback=unauthorized_callback)
+    jwt_manager.expired_token_loader(callback=unauthorized_callback)
 
 
 def add_error_handlers(app: Quart):

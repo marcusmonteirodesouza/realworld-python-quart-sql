@@ -79,12 +79,12 @@ async def login(data: LoginRequest) -> (UserResponse, int):
 @jwt_required
 @validate_response(model_class=UserResponse)
 async def get_current_user() -> (UserResponse, int):
-    user_id = get_jwt_identity()
+    username = get_jwt_identity()
 
-    user = await current_app.users_service.get_user_by_id(user_id=user_id)
+    user = await current_app.users_service.get_user_by_username(username=username)
 
     if not user:
-        raise NotFoundException(f"user_id {user_id} not found")
+        raise UnauthorizedException(f"username {username} not found")
 
     token = get_jwt_token(request=request)
 
