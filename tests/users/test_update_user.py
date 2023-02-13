@@ -88,6 +88,50 @@ async def test_when_username_is_set_should_return_200(app, faker, user):
 
 
 @pytest.mark.asyncio
+async def test_when_username_is_taken_should_return_422(app, faker, user):
+    client = app.test_client()
+
+    register_existing_user_data = {
+        "user": {
+            "email": faker.email(),
+            "password": faker.password(),
+            "username": faker.user_name(),
+        }
+    }
+
+    register_existing_user_response = await client.post(
+        "/users",
+        data=json.dumps(register_existing_user_data),
+        headers={"Content-Type": "application/json"},
+    )
+
+    assert register_existing_user_response.status_code == 201
+
+    register_existing_user_response_data = await register_existing_user_response.json
+
+    data = {
+        "user": {
+            "username": register_existing_user_response_data["user"]["username"],
+        }
+    }
+
+    response = await client.put(
+        "/user",
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {user.token}",
+        },
+    )
+
+    assert response.status_code == 422
+
+    response_data = await response.json
+
+    assert response_data["errors"]["body"][0] == f"username is taken"
+
+
+@pytest.mark.asyncio
 async def test_when_email_is_set_should_return_200(app, faker, user):
     client = app.test_client()
 
@@ -132,6 +176,78 @@ async def test_when_email_is_set_should_return_200(app, faker, user):
 
 
 @pytest.mark.asyncio
+async def test_when_email_is_invalid_should_return_400(app, faker, user):
+    client = app.test_client()
+
+    data = {
+        "user": {
+            "email": "an-invalid-email",
+        }
+    }
+
+    response = await client.put(
+        "/user",
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {user.token}",
+        },
+    )
+
+    assert response.status_code == 400
+
+    response_data = await response.json
+
+    assert (
+        response_data["errors"]["body"][0] == f"invalid email {data['user']['email']}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_when_email_is_taken_should_return_422(app, faker, user):
+    client = app.test_client()
+
+    register_existing_user_data = {
+        "user": {
+            "email": faker.email(),
+            "password": faker.password(),
+            "username": faker.user_name(),
+        }
+    }
+
+    register_existing_user_response = await client.post(
+        "/users",
+        data=json.dumps(register_existing_user_data),
+        headers={"Content-Type": "application/json"},
+    )
+
+    assert register_existing_user_response.status_code == 201
+
+    register_existing_user_response_data = await register_existing_user_response.json
+
+    data = {
+        "user": {
+            "email": register_existing_user_response_data["user"]["email"],
+        }
+    }
+
+    response = await client.put(
+        "/user",
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {user.token}",
+        },
+    )
+
+    assert response.status_code == 422
+
+    response_data = await response.json
+
+    assert response_data["errors"]["body"][0] == f"email is taken"
+
+
+@pytest.mark.asyncio
 async def test_when_password_is_set_should_return_200(app, faker, user):
     client = app.test_client()
 
@@ -173,6 +289,64 @@ async def test_when_password_is_set_should_return_200(app, faker, user):
     assert updated_user["token"] == user.token
     assert updated_user["bio"] == user.bio
     assert updated_user["image"] == user.image
+
+
+@pytest.mark.asyncio
+async def test_when_password_is_too_short_should_return_400(app, faker, user):
+    client = app.test_client()
+
+    data = {
+        "user": {
+            "password": faker.password(length=7),
+        }
+    }
+
+    response = await client.put(
+        "/user",
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {user.token}",
+        },
+    )
+
+    assert response.status_code == 400
+
+    response_data = await response.json
+
+    assert (
+        response_data["errors"]["body"][0]
+        == "password length must be greater than or equal to 8"
+    )
+
+
+@pytest.mark.asyncio
+async def test_when_password_is_too_long_should_return_400(app, faker, user):
+    client = app.test_client()
+
+    data = {
+        "user": {
+            "password": faker.password(length=65),
+        }
+    }
+
+    response = await client.put(
+        "/user",
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {user.token}",
+        },
+    )
+
+    assert response.status_code == 400
+
+    response_data = await response.json
+
+    assert (
+        response_data["errors"]["body"][0]
+        == "password length must be less than or equal to 64"
+    )
 
 
 @pytest.mark.asyncio
@@ -237,6 +411,35 @@ async def test_when_image_is_set_should_return_200(app, faker, user):
     assert updated_user["token"] == user.token
     assert updated_user["bio"] == user.bio
     assert updated_user["image"] == data["user"]["image"]
+
+
+@pytest.mark.asyncio
+async def test_when_image_is_invalid_should_return_400(app, faker, user):
+    client = app.test_client()
+
+    data = {
+        "user": {
+            "image": "not-an-url",
+        }
+    }
+
+    response = await client.put(
+        "/user",
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {user.token}",
+        },
+    )
+
+    assert response.status_code == 400
+
+    response_data = await response.json
+
+    assert (
+        response_data["errors"]["body"][0]
+        == f"invalid image {data['user']['image']}. It must be a valid url"
+    )
 
 
 @pytest.mark.asyncio

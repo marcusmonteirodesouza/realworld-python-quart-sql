@@ -1,7 +1,6 @@
 import datetime
 import json
 import os
-import uuid
 import pytest
 import jwt
 
@@ -169,7 +168,7 @@ async def test_when_email_is_taken_should_return_422(app, faker, user):
 
 
 @pytest.mark.asyncio
-async def test_when_password_length_less_than_8_should_return_400(app, faker):
+async def test_when_password_is_too_short_should_return_400(app, faker):
     client = app.test_client()
 
     data = {
@@ -195,7 +194,7 @@ async def test_when_password_length_less_than_8_should_return_400(app, faker):
 
 
 @pytest.mark.asyncio
-async def test_when_password_length_greater_than_64_should_return_400(app, faker):
+async def test_when_password_is_too_long_should_return_400(app, faker):
     client = app.test_client()
 
     data = {

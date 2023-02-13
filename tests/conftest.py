@@ -1,5 +1,6 @@
 import json
 import random
+import uuid
 import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
@@ -30,9 +31,9 @@ async def user(app, faker):
 
     register_user_data = {
         "user": {
-            "email": faker.email(),
+            "email": f"{str(uuid.uuid4())}@test.com",
             "password": faker.password(),
-            "username": faker.user_name(),
+            "username": str(uuid.uuid4()),
         }
     }
 
