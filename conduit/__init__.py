@@ -10,7 +10,13 @@ app = Quart(__name__)
 
 jwt_manager = JWTManager(app=app)
 
-QuartSchema(app=app, convert_casing=True)
+QuartSchema(
+    app=app,
+    convert_casing=True,
+    openapi_path=None,
+    redoc_ui_path=None,
+    swagger_ui_path=None,
+)
 
 app.config.from_object(config)
 

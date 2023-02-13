@@ -1,5 +1,6 @@
 import dataclasses
 import json
+import traceback
 from dataclasses import dataclass
 from http import HTTPStatus
 from typing import List
@@ -22,6 +23,7 @@ class _ErrorResponse:
 def add_jwt_manager_error_loaders(app: Quart, jwt_manager: JWTManager):
     def unauthorized_callback(reason: str) -> Response:
         app.logger.error(reason)
+        app.logger.error(traceback.format_exc())
 
         response = Response(
             response=json.dumps(
@@ -41,6 +43,7 @@ def add_error_handlers(app: Quart):
     @app.errorhandler(AlreadyExistsException)
     def handle_value_error(e: AlreadyExistsException):
         app.logger.error(e)
+        app.logger.error(traceback.format_exc())
 
         return (
             _ErrorResponse(_ErrorResponseBody([str(e)])),
@@ -50,6 +53,7 @@ def add_error_handlers(app: Quart):
     @app.errorhandler(UnauthorizedException)
     def handle_value_error(e: UnauthorizedException):
         app.logger.error(e)
+        app.logger.error(traceback.format_exc())
 
         return (
             _ErrorResponse(_ErrorResponseBody(["unauthorized"])),
@@ -59,6 +63,7 @@ def add_error_handlers(app: Quart):
     @app.errorhandler(ValueError)
     def handle_value_error(e: ValueError):
         app.logger.error(e)
+        app.logger.error(traceback.format_exc())
 
         return (
             _ErrorResponse(_ErrorResponseBody([str(e)])),
@@ -72,11 +77,15 @@ def add_error_handlers(app: Quart):
         except AttributeError:
             app.logger.error(e)
 
+        app.logger.error(traceback.format_exc())
+
         return _ErrorResponse(_ErrorResponseBody([e.description])), e.code
 
     @app.errorhandler(Exception)
     def handle_exception(e: Exception):
-        app.logger.error(e)
+        app.logger.error(f"{e.__class__.__name__}: {e}")
+        app.logger.error(traceback.format_stack())
+
         return (
             _ErrorResponse(_ErrorResponseBody(["internal server error"])),
             HTTPStatus.INTERNAL_SERVER_ERROR,

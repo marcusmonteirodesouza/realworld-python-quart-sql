@@ -10,11 +10,17 @@ db-up:
 up:
 	docker compose up -d --wait
 
+up-build:
+	docker compose up -d --wait --build
+
 down:
 	docker compose down
 
 run:
 	poetry run dotenv run -- python -m conduit
+
+run-fresh:
+	make down && make db-up && make run
 
 test:
 	make db-up && poetry run pytest
