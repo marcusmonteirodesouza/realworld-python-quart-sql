@@ -1,7 +1,6 @@
 import datetime
 import json
 import os
-import uuid
 import pytest
 import jwt
 
@@ -28,8 +27,8 @@ async def test_when_valid_request_should_return_201(app, faker):
 
     created_user = response_data["user"]
 
-    assert created_user["email"] == data["user"]["email"]
     assert created_user["username"] == data["user"]["username"]
+    assert created_user["email"] == data["user"]["email"]
 
     decoded_token = jwt.decode(
         jwt=created_user["token"], key=os.environ["SECRET_KEY"], algorithms="HS256"
@@ -78,9 +77,9 @@ async def test_when_username_is_taken_should_return_422(app, faker, user):
 
     data = {
         "user": {
+            "username": user.username,
             "email": faker.email(),
             "password": faker.password(),
-            "username": user.username,
         }
     }
 
@@ -101,8 +100,8 @@ async def test_when_email_not_sent_should_return_400(app, faker):
 
     data = {
         "user": {
-            "password": faker.password(),
             "username": faker.user_name(),
+            "password": faker.password(),
         }
     }
 
@@ -126,9 +125,9 @@ async def test_when_invalid_email_should_return_400(app, faker):
 
     data = {
         "user": {
+            "username": faker.user_name(),
             "email": "an-invalid-email",
             "password": faker.password(),
-            "username": faker.user_name(),
         }
     }
 
@@ -151,9 +150,9 @@ async def test_when_email_is_taken_should_return_422(app, faker, user):
 
     data = {
         "user": {
+            "username": faker.user_name(),
             "email": user.email,
             "password": faker.password(),
-            "username": faker.user_name(),
         }
     }
 
@@ -169,14 +168,14 @@ async def test_when_email_is_taken_should_return_422(app, faker, user):
 
 
 @pytest.mark.asyncio
-async def test_when_password_length_less_than_8_should_return_400(app, faker):
+async def test_when_password_is_too_short_should_return_400(app, faker):
     client = app.test_client()
 
     data = {
         "user": {
+            "username": faker.user_name(),
             "email": faker.email(),
             "password": faker.password(length=7),
-            "username": faker.user_name(),
         }
     }
 
@@ -195,14 +194,14 @@ async def test_when_password_length_less_than_8_should_return_400(app, faker):
 
 
 @pytest.mark.asyncio
-async def test_when_password_length_greater_than_64_should_return_400(app, faker):
+async def test_when_password_is_too_long_should_return_400(app, faker):
     client = app.test_client()
 
     data = {
         "user": {
+            "username": faker.user_name(),
             "email": faker.email(),
             "password": faker.password(length=65),
-            "username": faker.user_name(),
         }
     }
 
