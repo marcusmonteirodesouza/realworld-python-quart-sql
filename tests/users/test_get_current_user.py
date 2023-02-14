@@ -4,8 +4,10 @@ from ..utils import create_jwt
 
 
 @pytest.mark.asyncio
-async def test_when_valid_request_should_return_200(app, faker, user):
+async def test_when_valid_request_should_return_200(app, faker, create_user):
     client = app.test_client()
+
+    user = await create_user()
 
     response = await client.get(
         "/user",
@@ -40,9 +42,11 @@ async def test_when_authorization_header_is_not_set_should_return_401(app, faker
 
 @pytest.mark.asyncio
 async def test_when_authorization_header_has_invalid_scheme_should_return_401(
-    app, faker, user
+    app, faker, create_user
 ):
     client = app.test_client()
+
+    user = await create_user()
 
     response = await client.get(
         "/user",
@@ -57,8 +61,12 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_401(
 
 
 @pytest.mark.asyncio
-async def test_when_token_has_invalid_signature_should_return_401(app, faker, user):
+async def test_when_token_has_invalid_signature_should_return_401(
+    app, faker, create_user
+):
     client = app.test_client()
+
+    user = await create_user()
 
     secret_key = secrets.token_urlsafe()
 
@@ -77,8 +85,10 @@ async def test_when_token_has_invalid_signature_should_return_401(app, faker, us
 
 
 @pytest.mark.asyncio
-async def test_when_token_is_expired_should_return_401(app, faker, user):
+async def test_when_token_is_expired_should_return_401(app, faker, create_user):
     client = app.test_client()
+
+    user = await create_user()
 
     token = create_jwt(username=user.username, expires_seconds=-1)
 

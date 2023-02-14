@@ -26,56 +26,59 @@ def faker_seed():
 
 
 @pytest_asyncio.fixture(scope="function")
-async def user(app, faker):
-    client = app.test_client()
+async def create_user(app, faker):
+    async def _create_user():
+        client = app.test_client()
 
-    register_user_data = {
-        "user": {
-            "email": f"{str(uuid.uuid4())}@test.com",
-            "password": faker.password(),
-            "username": str(uuid.uuid4()),
+        register_user_data = {
+            "user": {
+                "email": f"{str(uuid.uuid4())}@test.com",
+                "password": faker.password(),
+                "username": str(uuid.uuid4()),
+            }
         }
-    }
 
-    register_user_response = await client.post(
-        "/users",
-        data=json.dumps(register_user_data),
-        headers={"Content-Type": "application/json"},
-    )
+        register_user_response = await client.post(
+            "/users",
+            data=json.dumps(register_user_data),
+            headers={"Content-Type": "application/json"},
+        )
 
-    assert register_user_response.status_code == 201
+        assert register_user_response.status_code == 201
 
-    register_user_response_data = await register_user_response.json
+        register_user_response_data = await register_user_response.json
 
-    created_user = register_user_response_data["user"]
+        created_user = register_user_response_data["user"]
 
-    update_user_data = {
-        "user": {
-            "bio": faker.paragraph(),
-            "image": faker.url(),
+        update_user_data = {
+            "user": {
+                "bio": faker.paragraph(),
+                "image": faker.url(),
+            }
         }
-    }
 
-    update_user_response = await client.put(
-        "/user",
-        data=json.dumps(update_user_data),
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Token {created_user['token']}",
-        },
-    )
+        update_user_response = await client.put(
+            "/user",
+            data=json.dumps(update_user_data),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Token {created_user['token']}",
+            },
+        )
 
-    assert update_user_response.status_code == 200
+        assert update_user_response.status_code == 200
 
-    update_user_response_data = await update_user_response.json
+        update_user_response_data = await update_user_response.json
 
-    updated_user_user = update_user_response_data["user"]
+        updated_user_user = update_user_response_data["user"]
 
-    yield User(
-        email=created_user["email"],
-        username=created_user["username"],
-        token=created_user["token"],
-        bio=updated_user_user["bio"],
-        image=updated_user_user["image"],
-        password=register_user_data["user"]["password"],
-    )
+        return User(
+            email=created_user["email"],
+            username=created_user["username"],
+            token=created_user["token"],
+            bio=updated_user_user["bio"],
+            image=updated_user_user["image"],
+            password=register_user_data["user"]["password"],
+        )
+
+    yield _create_user

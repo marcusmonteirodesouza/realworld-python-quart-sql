@@ -72,8 +72,10 @@ async def test_when_username_not_sent_should_return_400(app, faker):
 
 
 @pytest.mark.asyncio
-async def test_when_username_is_taken_should_return_422(app, faker, user):
+async def test_when_username_is_taken_should_return_422(app, faker, create_user):
     client = app.test_client()
+
+    user = await create_user()
 
     data = {
         "user": {
@@ -145,8 +147,10 @@ async def test_when_invalid_email_should_return_400(app, faker):
 
 
 @pytest.mark.asyncio
-async def test_when_email_is_taken_should_return_422(app, faker, user):
+async def test_when_email_is_taken_should_return_422(app, faker, create_user):
     client = app.test_client()
+
+    user = await create_user()
 
     data = {
         "user": {
