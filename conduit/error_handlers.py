@@ -7,7 +7,7 @@ from typing import List
 from quart import Quart, Response
 from quart_jwt_extended import JWTManager
 from werkzeug.exceptions import HTTPException
-from .exceptions import AlreadyExistsException, UnauthorizedException
+from .exceptions import AlreadyExistsException, UnauthorizedException, NotFoundException
 
 
 @dataclass
@@ -58,6 +58,16 @@ def add_error_handlers(app: Quart):
         return (
             _ErrorResponse(_ErrorResponseBody(["unauthorized"])),
             HTTPStatus.UNAUTHORIZED,
+        )
+
+    @app.errorhandler(NotFoundException)
+    def handle_value_error(e: NotFoundException):
+        app.logger.error(e)
+        app.logger.error(traceback.format_exc())
+
+        return (
+            _ErrorResponse(_ErrorResponseBody([str(e)])),
+            HTTPStatus.NOT_FOUND,
         )
 
     @app.errorhandler(ValueError)

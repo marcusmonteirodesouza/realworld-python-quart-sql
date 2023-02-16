@@ -9,6 +9,53 @@ def make_follow_user_url(followed_username: str) -> str:
 
 
 @pytest.mark.asyncio
+async def test_when_valid_request_should_return_200(app, create_user):
+    client = app.test_client()
+
+    follower = await create_user()
+
+    followed = await create_user()
+
+    response = await client.post(
+        make_follow_user_url(followed_username=followed.username),
+        headers={"Authorization": f"Token {follower.token}"},
+    )
+
+    assert response.status_code == 200
+
+    response_data = await response.json
+
+    profile = response_data["user"]
+
+    assert profile["username"] == followed.username
+    assert profile["bio"] == followed.bio
+    assert profile["image"] == followed.image
+    assert profile["following"]
+
+
+@pytest.mark.asyncio
+async def test_when_followed_is_not_found_should_return_404(app, create_user):
+    client = app.test_client()
+
+    follower = await create_user()
+
+    followed_username = str(uuid.uuid4())
+
+    response = await client.post(
+        make_follow_user_url(followed_username=followed_username),
+        headers={"Authorization": f"Token {follower.token}"},
+    )
+
+    assert response.status_code == 404
+
+    response_data = await response.json
+
+    assert (
+        response_data["errors"]["body"][0] == f"username {followed_username} not found"
+    )
+
+
+@pytest.mark.asyncio
 async def test_when_authorization_header_is_not_set_should_return_401(app, create_user):
     client = app.test_client()
 
