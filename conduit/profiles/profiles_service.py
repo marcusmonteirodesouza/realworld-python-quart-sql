@@ -1,4 +1,5 @@
 import psycopg
+from typing import Optional
 from .profile import Profile
 from .. import UsersService
 from ..exceptions import AlreadyExistsException, NotFoundException
@@ -9,6 +10,33 @@ class ProfilesService:
         self._aconn = aconn
         self._users_service = users_service
         self._follows_table = "follows"
+
+    async def get_profile_by_username(
+        self, username: str, follower_id: Optional[str] = None
+    ) -> Profile:
+        followed = await self._users_service.get_user_by_username(username=username)
+
+        if not followed:
+            raise NotFoundException(f"user {username} not found")
+
+        profile = Profile(
+            username=followed.username,
+            bio=followed.bio,
+            image=followed.image,
+            following=False,
+        )
+
+        if follower_id:
+            follower = await self._users_service.get_user_by_id(id=follower_id)
+
+            if not follower:
+                raise NotFoundException(f"follower {follower_id} not found")
+
+            profile.following = await self._is_following(
+                follower_id=follower.id, followed_id=followed.id
+            )
+
+        return profile
 
     async def follow_user_by_username(
         self, follower_id: str, followed_username: str
@@ -44,3 +72,25 @@ class ProfilesService:
                 image=followed.image,
                 following=True,
             )
+
+    async def _is_following(self, follower_id: str, followed_id: str) -> bool:
+        async with self._aconn.cursor() as acur:
+            is_following_query = f"""
+                SELECT EXISTS(
+                    SELECT 1 FROM {self._follows_table}
+                    WHERE follower_id = %s
+                    AND followed_id = %s
+                );
+            """
+
+            await acur.execute(
+                is_following_query,
+                (
+                    follower_id,
+                    followed_id,
+                ),
+            )
+
+            record = await acur.fetchone()
+
+            return record[0]

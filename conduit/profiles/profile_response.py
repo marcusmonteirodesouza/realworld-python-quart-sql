@@ -12,4 +12,4 @@ class ProfileResponseProfile:
 
 @dataclass
 class ProfileResponse:
-    user: ProfileResponseProfile
+    profile: ProfileResponseProfile

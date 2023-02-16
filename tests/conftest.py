@@ -4,6 +4,8 @@ import uuid
 import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
+
+from .profiles.profile import Profile
 from .users import User
 
 
@@ -82,3 +84,29 @@ async def create_user(app, faker):
         )
 
     yield _create_user
+
+
+@pytest_asyncio.fixture(scope="function")
+async def follow_user(app):
+    async def _follow_user(follower_token: str, username: str):
+        client = app.test_client()
+
+        response = await client.post(
+            f"/profiles/{username}/follow",
+            headers={"Authorization": f"Token {follower_token}"},
+        )
+
+        assert response.status_code == 200
+
+        response_data = await response.json
+
+        profile_data = response_data["profile"]
+
+        return Profile(
+            username=profile_data["username"],
+            bio=profile_data["bio"],
+            image=profile_data["image"],
+            following=profile_data["following"],
+        )
+
+    yield _follow_user
