@@ -51,20 +51,15 @@ class ProfilesService:
         async with self._aconn.cursor() as acur:
             follow_user_query = f"""
                 INSERT INTO {self._follows_table} (follower_id, followed_id)
-                VALUES (%s, %s);
+                VALUES (%(follower_id)s, %(followed_id)s)
+                ON CONFLICT(follower_id, followed_id)
+                DO UPDATE SET deleted_at = NULL;
             """
 
-            try:
-                await acur.execute(
-                    follow_user_query,
-                    (
-                        follower_id,
-                        followed.id,
-                    ),
-                )
-            except psycopg.errors.UniqueViolation as e:
-                if e.diag.constraint_name != "follows_follower_id_followed_id_key":
-                    raise e
+            await acur.execute(
+                follow_user_query,
+                {"follower_id": follower_id, "followed_id": followed.id},
+            )
 
             return Profile(
                 username=followed.username,
@@ -85,7 +80,8 @@ class ProfilesService:
 
         async with self._aconn.cursor() as acur:
             unfollow_user_query = f"""
-                DELETE FROM {self._follows_table}
+                UPDATE {self._follows_table}
+                SET deleted_at = current_timestamp
                 WHERE follower_id = %s
                 AND followed_id = %s;
             """
@@ -112,6 +108,7 @@ class ProfilesService:
                     SELECT 1 FROM {self._follows_table}
                     WHERE follower_id = %s
                     AND followed_id = %s
+                    AND deleted_at IS NULL
                 );
             """
 
