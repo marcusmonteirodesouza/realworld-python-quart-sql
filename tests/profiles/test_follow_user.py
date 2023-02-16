@@ -25,12 +25,43 @@ async def test_when_valid_request_should_return_200(app, create_user):
 
     response_data = await response.json
 
-    profile = response_data["user"]
+    profile = response_data["profile"]
 
     assert profile["username"] == followed.username
     assert profile["bio"] == followed.bio
     assert profile["image"] == followed.image
     assert profile["following"]
+
+
+@pytest.mark.asyncio
+async def given_user_is_already_followed_when_valid_request_should_return_200(
+    app, create_user, follow_user
+):
+    client = app.test_client()
+
+    follower = await create_user()
+
+    followed = await create_user()
+
+    follow_user_profile = await follow_user(
+        follower_token=follower.token, username=followed.username
+    )
+
+    response = await client.post(
+        make_follow_user_url(followed_username=followed.username),
+        headers={"Authorization": f"Token {follower.token}"},
+    )
+
+    assert response.status_code == 200
+
+    response_data = await response.json
+
+    profile = response_data["profile"]
+
+    assert profile["username"] == follow_user_profile.username
+    assert profile["bio"] == follow_user_profile.bio
+    assert profile["image"] == follow_user_profile.image
+    assert profile["following"] and follow_user_profile.following
 
 
 @pytest.mark.asyncio
@@ -141,7 +172,7 @@ async def test_when_token_is_expired_should_return_401(app, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_user_is_not_found_should_return_401(app, faker, create_user):
+async def test_when_follower_is_not_found_should_return_401(app, faker, create_user):
     client = app.test_client()
 
     token = create_jwt(username=str(uuid.uuid4()))
