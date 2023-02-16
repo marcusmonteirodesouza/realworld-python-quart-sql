@@ -9,7 +9,7 @@ def make_get_profile_url(username: str) -> str:
 
 
 @pytest.mark.asyncio
-async def test_given_user_is_followed_when_valid_request_and_valid_token_should_return_200(
+async def test_when_user_is_followed_and_valid_token_should_return_200(
     app, create_user, follow_user
 ):
     client = app.test_client()
@@ -38,7 +38,7 @@ async def test_given_user_is_followed_when_valid_request_and_valid_token_should_
 
 
 @pytest.mark.asyncio
-async def test_given_user_is_not_followed_when_valid_request_and_valid_token_should_return_200(
+async def test_when_user_is_not_followed_and_valid_token_should_return_200(
     app, create_user
 ):
     client = app.test_client()
@@ -65,7 +65,7 @@ async def test_given_user_is_not_followed_when_valid_request_and_valid_token_sho
 
 
 @pytest.mark.asyncio
-async def test_when_valid_token_and_followed_is_not_found_should_return_404(
+async def test_when_user_is_not_found_and_valid_token_should_return_404(
     app, create_user
 ):
     client = app.test_client()
@@ -90,9 +90,7 @@ async def test_when_valid_token_and_followed_is_not_found_should_return_404(
 
 
 @pytest.mark.asyncio
-async def test_when_no_token_and_followed_is_not_found_should_return_404(
-    app, create_user
-):
+async def test_when_user_is_not_found_and_no_token_should_return_404(app, create_user):
     client = app.test_client()
 
     followed_username = str(uuid.uuid4())
@@ -109,7 +107,7 @@ async def test_when_no_token_and_followed_is_not_found_should_return_404(
 
 
 @pytest.mark.asyncio
-async def test_when_valid_token_and_follower_is_not_found_should_return_401(
+async def test_when_follower_is_not_found_and_valid_token_should_return_401(
     app, faker, create_user
 ):
     client = app.test_client()
