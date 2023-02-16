@@ -1,6 +1,7 @@
 import pytest
 import json
 import secrets
+import uuid
 from ..utils import create_jwt
 
 
@@ -92,7 +93,7 @@ async def test_when_username_is_set_should_return_200(app, faker, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_username_is_taken_should_return_422(app, faker, create_user):
+async def test_when_username_is_taken_should_return_422(app, create_user):
     client = app.test_client()
 
     user = await create_user()
@@ -168,7 +169,7 @@ async def test_when_email_is_set_should_return_200(app, faker, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_email_is_invalid_should_return_400(app, faker, create_user):
+async def test_when_email_is_invalid_should_return_400(app, create_user):
     client = app.test_client()
 
     user = await create_user()
@@ -198,7 +199,7 @@ async def test_when_email_is_invalid_should_return_400(app, faker, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_email_is_taken_should_return_422(app, faker, create_user):
+async def test_when_email_is_taken_should_return_422(app, create_user):
     client = app.test_client()
 
     user = await create_user()
@@ -404,7 +405,7 @@ async def test_when_image_is_set_should_return_200(app, faker, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_image_is_invalid_should_return_400(app, faker, create_user):
+async def test_when_image_is_invalid_should_return_400(app, create_user):
     client = app.test_client()
 
     user = await create_user()
@@ -435,7 +436,7 @@ async def test_when_image_is_invalid_should_return_400(app, faker, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_authorization_header_is_not_set_should_return_401(app, faker):
+async def test_when_authorization_header_is_not_set_should_return_401(app):
     client = app.test_client()
 
     response = await client.put("/user")
@@ -449,7 +450,7 @@ async def test_when_authorization_header_is_not_set_should_return_401(app, faker
 
 @pytest.mark.asyncio
 async def test_when_authorization_header_has_invalid_scheme_should_return_401(
-    app, faker, create_user
+    app, create_user
 ):
     client = app.test_client()
 
@@ -468,9 +469,7 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_401(
 
 
 @pytest.mark.asyncio
-async def test_when_token_has_invalid_signature_should_return_401(
-    app, faker, create_user
-):
+async def test_when_token_has_invalid_signature_should_return_401(app, create_user):
     client = app.test_client()
 
     user = await create_user()
@@ -492,7 +491,7 @@ async def test_when_token_has_invalid_signature_should_return_401(
 
 
 @pytest.mark.asyncio
-async def test_when_token_is_expired_should_return_401(app, faker, create_user):
+async def test_when_token_is_expired_should_return_401(app, create_user):
     client = app.test_client()
 
     user = await create_user()
@@ -515,7 +514,7 @@ async def test_when_token_is_expired_should_return_401(app, faker, create_user):
 async def test_when_user_is_not_found_should_return_401(app, faker):
     client = app.test_client()
 
-    token = create_jwt(username=faker.user_name())
+    token = create_jwt(username=str(uuid.uuid4()))
 
     data = {
         "user": {

@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS users(
 CREATE TABLE IF NOT EXISTS follows(
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   follower_id UUID references users(id),
-  followee_id UUID references users(id),
+  followed_id UUID references users(id),
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
   deleted_at TIMESTAMP,
-  UNIQUE(follower_id, followee_id)
+  UNIQUE(follower_id, followed_id)
 )

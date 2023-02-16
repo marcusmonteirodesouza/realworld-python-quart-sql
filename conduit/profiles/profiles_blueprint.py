@@ -14,17 +14,19 @@ profiles_blueprint = Blueprint("profiles", __name__)
 async def follow_user(username: str) -> (ProfileResponse, int):
     follower_username = get_jwt_identity()
 
-    follower = await current_app.users_service.get_user_by_username(username=username)
+    follower = await current_app.users_service.get_user_by_username(
+        username=follower_username
+    )
 
     if not follower:
         raise UnauthorizedException(f"follower {follower_username} not found")
 
     current_app.logger.info(
-        f"received follow user request. follower_id: {follower.id}, followee_username: {username}"
+        f"received follow user request. follower_id: {follower.id}, followed_username: {username}"
     )
 
     profile = await current_app.profiles_service.follow_user_by_username(
-        follower_id=follower.id, followee_username=username
+        follower_id=follower.id, followed_username=username
     )
 
     return ProfileResponse(

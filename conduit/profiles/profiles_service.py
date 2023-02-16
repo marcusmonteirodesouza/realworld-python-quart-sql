@@ -11,18 +11,18 @@ class ProfilesService:
         self._follows_table = "follows"
 
     async def follow_user_by_username(
-        self, follower_id: str, followee_username: str
+        self, follower_id: str, followed_username: str
     ) -> Profile:
-        followee = await self._users_service.get_user_by_username(
-            username=followee_username
+        followed = await self._users_service.get_user_by_username(
+            username=followed_username
         )
 
-        if not followee:
-            raise NotFoundException(f"username {followee_username} not found")
+        if not followed:
+            raise NotFoundException(f"username {followed_username} not found")
 
         async with self._aconn.cursor() as acur:
             follow_user_query = f"""
-                INSERT INTO {self._follows_table} (follower_id, followee_id)
+                INSERT INTO {self._follows_table} (follower_id, followed_id)
                 VALUES (%s, %s);
             """
 
@@ -31,16 +31,16 @@ class ProfilesService:
                     follow_user_query,
                     (
                         follower_id,
-                        followee.id,
+                        followed.id,
                     ),
                 )
             except psycopg.errors.UniqueViolation as e:
-                if e.diag.constraint_name != "follows_follower_id_followee_id_key":
+                if e.diag.constraint_name != "follows_follower_id_followed_id_key":
                     raise e
 
             return Profile(
-                username=followee.username,
-                bio=followee.bio,
-                image=followee.image,
+                username=followed.username,
+                bio=followed.bio,
+                image=followed.image,
                 following=True,
             )
