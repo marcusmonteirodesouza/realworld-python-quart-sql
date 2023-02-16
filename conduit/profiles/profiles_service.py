@@ -2,7 +2,7 @@ import psycopg
 from typing import Optional
 from .profile import Profile
 from .. import UsersService
-from ..exceptions import AlreadyExistsException, NotFoundException
+from ..exceptions import NotFoundException
 
 
 class ProfilesService:
@@ -71,6 +71,38 @@ class ProfilesService:
                 bio=followed.bio,
                 image=followed.image,
                 following=True,
+            )
+
+    async def unfollow_user_by_username(
+        self, follower_id: str, followed_username: str
+    ) -> Profile:
+        followed = await self._users_service.get_user_by_username(
+            username=followed_username
+        )
+
+        if not followed:
+            raise NotFoundException(f"username {followed_username} not found")
+
+        async with self._aconn.cursor() as acur:
+            unfollow_user_query = f"""
+                DELETE FROM {self._follows_table}
+                WHERE follower_id = %s
+                AND followed_id = %s;
+            """
+
+            await acur.execute(
+                unfollow_user_query,
+                (
+                    follower_id,
+                    followed.id,
+                ),
+            )
+
+            return Profile(
+                username=followed.username,
+                bio=followed.bio,
+                image=followed.image,
+                following=False,
             )
 
     async def _is_following(self, follower_id: str, followed_id: str) -> bool:
