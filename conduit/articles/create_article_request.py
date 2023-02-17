@@ -7,7 +7,7 @@ class CreateArticleRequestArticle:
     title: str
     description: str
     body: str
-    tag_list: Optional[List[str]]
+    tag_list: Optional[List[str]] = None
 
 
 @dataclass

@@ -49,13 +49,13 @@ class ArticlesService:
                 title=title,
                 description=description,
                 body=body,
-                tags=tags,
+                tags=tags if tags else [],
                 created_at=record[1],
                 updated_at=record[2],
                 favorites_count=0,
             )
 
-            if tags and len(tags) > 0:
+            if len(article.tags) > 0:
                 article.tags = await self._overwrite_articles_tags(
                     acur=acur, article_id=article.id, tags=tags
                 )

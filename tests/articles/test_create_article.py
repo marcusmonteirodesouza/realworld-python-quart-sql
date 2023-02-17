@@ -4,6 +4,7 @@ import json
 import re
 import secrets
 import uuid
+import validators
 from ..utils import create_jwt
 
 
@@ -56,6 +57,182 @@ async def test_should_return_201(app, faker, create_user):
         "image": author.image,
         "following": False,
     }
+
+
+@pytest.mark.asyncio
+async def test_when_tagList_is_not_sent_should_return_201(app, faker, create_user):
+    client = app.test_client()
+
+    author = await create_user()
+
+    data = {
+        "article": {
+            "title": faker.sentence(),
+            "description": faker.sentence(),
+            "body": faker.paragraph(),
+        }
+    }
+
+    response = await client.post(
+        "/articles",
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {author.token}",
+        },
+    )
+
+    assert response.status_code == 201
+
+    response_data = await response.json
+
+    article = response_data["article"]
+
+    now = datetime.datetime.now(tz=datetime.timezone.utc)
+
+    assert validators.slug(article["slug"])
+    assert article["title"] == data["article"]["title"]
+    assert article["description"] == data["article"]["description"]
+    assert article["description"] == data["article"]["description"]
+    assert article["tagList"] == []
+    created_at = datetime.datetime.fromisoformat(article["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(article["updatedAt"])
+    assert created_at == updated_at
+    assert (now - created_at).total_seconds() < 1
+    assert not article["favorited"]
+    assert article["favoritesCount"] == 0
+    assert article["author"] == {
+        "username": author.username,
+        "bio": author.bio,
+        "image": author.image,
+        "following": False,
+    }
+
+
+@pytest.mark.asyncio
+async def test_when_article_is_not_sent_should_return_400(app, faker, create_user):
+    client = app.test_client()
+
+    author = await create_user()
+
+    data = {}
+
+    response = await client.post(
+        "/articles",
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {author.token}",
+        },
+    )
+
+    assert response.status_code == 400
+
+    response_data = await response.json
+
+    assert (
+        response_data["errors"]["body"][0]
+        == "The browser (or proxy) sent a request that this server could not understand."
+    )
+
+
+@pytest.mark.asyncio
+async def test_when_title_is_not_sent_should_return_400(app, faker, create_user):
+    client = app.test_client()
+
+    author = await create_user()
+
+    data = {
+        "article": {
+            "description": faker.sentence(),
+            "body": faker.paragraph(),
+            "tagList": faker.words(),
+        }
+    }
+
+    response = await client.post(
+        "/articles",
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {author.token}",
+        },
+    )
+
+    assert response.status_code == 400
+
+    response_data = await response.json
+
+    assert (
+        response_data["errors"]["body"][0]
+        == "The browser (or proxy) sent a request that this server could not understand."
+    )
+
+
+@pytest.mark.asyncio
+async def test_when_description_is_not_sent_should_return_400(app, faker, create_user):
+    client = app.test_client()
+
+    author = await create_user()
+
+    data = {
+        "article": {
+            "title": faker.sentence(),
+            "body": faker.paragraph(),
+            "tagList": faker.words(),
+        }
+    }
+
+    response = await client.post(
+        "/articles",
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {author.token}",
+        },
+    )
+
+    assert response.status_code == 400
+
+    response_data = await response.json
+
+    assert (
+        response_data["errors"]["body"][0]
+        == "The browser (or proxy) sent a request that this server could not understand."
+    )
+
+
+@pytest.mark.asyncio
+async def test_when_body_is_not_sent_should_return_400(app, faker, create_user):
+    client = app.test_client()
+
+    author = await create_user()
+
+    data = {
+        "article": {
+            "title": faker.sentence(),
+            "description": faker.paragraph(),
+            "tagList": faker.words(),
+        }
+    }
+
+    response = await client.post(
+        "/articles",
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {author.token}",
+        },
+    )
+
+    assert response.status_code == 400
+
+    response_data = await response.json
+
+    assert (
+        response_data["errors"]["body"][0]
+        == "The browser (or proxy) sent a request that this server could not understand."
+    )
 
 
 @pytest.mark.asyncio

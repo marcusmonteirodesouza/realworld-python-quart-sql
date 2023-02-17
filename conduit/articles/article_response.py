@@ -1,14 +1,14 @@
 import datetime
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 
 @dataclass
 class ArticleResponseArticleAuthorProfile:
     username: str
-    bio: str
-    image: str
     following: bool
+    bio: Optional[str] = None
+    image: Optional[str] = None
 
 
 @dataclass
