@@ -169,7 +169,7 @@ async def test_when_email_is_set_should_return_200(app, faker, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_email_is_invalid_should_return_400(app, create_user):
+async def test_when_email_is_invalid_should_return_422(app, create_user):
     client = app.test_client()
 
     user = await create_user()
@@ -189,7 +189,7 @@ async def test_when_email_is_invalid_should_return_400(app, create_user):
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
 
     response_data = await response.json
 
@@ -275,7 +275,7 @@ async def test_when_password_is_set_should_return_200(app, faker, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_password_is_too_short_should_return_400(app, faker, create_user):
+async def test_when_password_is_too_short_should_return_422(app, faker, create_user):
     client = app.test_client()
 
     user = await create_user()
@@ -295,7 +295,7 @@ async def test_when_password_is_too_short_should_return_400(app, faker, create_u
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
 
     response_data = await response.json
 
@@ -306,7 +306,7 @@ async def test_when_password_is_too_short_should_return_400(app, faker, create_u
 
 
 @pytest.mark.asyncio
-async def test_when_password_is_too_long_should_return_400(app, faker, create_user):
+async def test_when_password_is_too_long_should_return_422(app, faker, create_user):
     client = app.test_client()
 
     user = await create_user()
@@ -326,7 +326,7 @@ async def test_when_password_is_too_long_should_return_400(app, faker, create_us
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
 
     response_data = await response.json
 
@@ -405,7 +405,7 @@ async def test_when_image_is_set_should_return_200(app, faker, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_image_is_invalid_should_return_400(app, create_user):
+async def test_when_image_is_invalid_should_return_422(app, create_user):
     client = app.test_client()
 
     user = await create_user()
@@ -425,7 +425,7 @@ async def test_when_image_is_invalid_should_return_400(app, create_user):
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
 
     response_data = await response.json
 

@@ -115,6 +115,32 @@ async def follow_user(app):
 
 
 @pytest_asyncio.fixture(scope="function")
+async def unfollow_user(app):
+    async def _unfollow_user(follower_token: str, username: str):
+        client = app.test_client()
+
+        response = await client.delete(
+            f"/profiles/{username}/follow",
+            headers={"Authorization": f"Token {follower_token}"},
+        )
+
+        assert response.status_code == 200
+
+        response_data = await response.json
+
+        profile_data = response_data["profile"]
+
+        return Profile(
+            username=profile_data["username"],
+            bio=profile_data["bio"],
+            image=profile_data["image"],
+            following=profile_data["following"],
+        )
+
+    yield _unfollow_user
+
+
+@pytest_asyncio.fixture(scope="function")
 async def get_profile(app):
     async def _get_profile(username: str, follower_token: Optional[str]):
         client = app.test_client()

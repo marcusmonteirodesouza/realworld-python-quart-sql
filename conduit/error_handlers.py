@@ -77,7 +77,7 @@ def add_error_handlers(app: Quart):
 
         return (
             _ErrorResponse(_ErrorResponseBody([str(e)])),
-            HTTPStatus.BAD_REQUEST,
+            HTTPStatus.UNPROCESSABLE_ENTITY,
         )
 
     @app.errorhandler(HTTPException)

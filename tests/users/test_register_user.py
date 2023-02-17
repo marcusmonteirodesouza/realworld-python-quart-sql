@@ -6,7 +6,7 @@ import jwt
 
 
 @pytest.mark.asyncio
-async def test_when_valid_request_should_return_201(app, faker):
+async def test_should_return_201(app, faker):
     client = app.test_client()
 
     data = {
@@ -122,7 +122,7 @@ async def test_when_email_not_sent_should_return_400(app, faker):
 
 
 @pytest.mark.asyncio
-async def test_when_invalid_email_should_return_400(app, faker):
+async def test_when_invalid_email_should_return_422(app, faker):
     client = app.test_client()
 
     data = {
@@ -137,7 +137,7 @@ async def test_when_invalid_email_should_return_400(app, faker):
         "/users", data=json.dumps(data), headers={"Content-Type": "application/json"}
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
 
     response_data = await response.json
 
@@ -172,7 +172,7 @@ async def test_when_email_is_taken_should_return_422(app, faker, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_password_is_too_short_should_return_400(app, faker):
+async def test_when_password_is_too_short_should_return_422(app, faker):
     client = app.test_client()
 
     data = {
@@ -187,7 +187,7 @@ async def test_when_password_is_too_short_should_return_400(app, faker):
         "/users", data=json.dumps(data), headers={"Content-Type": "application/json"}
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
 
     response_data = await response.json
 
@@ -198,7 +198,7 @@ async def test_when_password_is_too_short_should_return_400(app, faker):
 
 
 @pytest.mark.asyncio
-async def test_when_password_is_too_long_should_return_400(app, faker):
+async def test_when_password_is_too_long_should_return_422(app, faker):
     client = app.test_client()
 
     data = {
@@ -213,7 +213,7 @@ async def test_when_password_is_too_long_should_return_400(app, faker):
         "/users", data=json.dumps(data), headers={"Content-Type": "application/json"}
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
 
     response_data = await response.json
 
