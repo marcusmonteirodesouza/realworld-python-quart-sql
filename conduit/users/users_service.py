@@ -29,6 +29,8 @@ class UsersService:
             try:
                 await acur.execute(insert_user_query, (username, email, password_hash))
             except psycopg.errors.UniqueViolation as e:
+                await self._aconn.rollback()
+
                 if e.diag.constraint_name == f"{self._users_table}_username_key":
                     raise AlreadyExistsException("username is taken")
                 elif e.diag.constraint_name == f"{self._users_table}_email_key":
@@ -46,7 +48,9 @@ class UsersService:
                 image=None,
             )
 
-            return user
+        await self._aconn.commit()
+
+        return user
 
     async def get_user_by_id(self, id: str) -> Optional[User]:
         async with self._aconn.cursor() as acur:
@@ -71,7 +75,9 @@ class UsersService:
                 image=record[3],
             )
 
-            return user
+        await self._aconn.commit()
+
+        return user
 
     async def get_user_by_username(self, username: str) -> Optional[User]:
         async with self._aconn.cursor() as acur:
@@ -96,7 +102,9 @@ class UsersService:
                 image=record[3],
             )
 
-            return user
+        await self._aconn.commit()
+
+        return user
 
     async def get_user_by_email(self, email: str) -> Optional[User]:
         async with self._aconn.cursor() as acur:
@@ -121,7 +129,9 @@ class UsersService:
                 image=record[3],
             )
 
-            return user
+        await self._aconn.commit()
+
+        return user
 
     async def update_user(self, user_id: str, params: UpdateUserParams):
         initial_update_user_query = f"UPDATE {self._users_table}"
@@ -196,6 +206,8 @@ class UsersService:
                         params=query_params,
                     )
                 except psycopg.errors.UniqueViolation as e:
+                    await self._aconn.rollback()
+
                     if e.diag.constraint_name == f"{self._users_table}_username_key":
                         raise AlreadyExistsException("username is taken")
                     elif e.diag.constraint_name == f"{self._users_table}_email_key":
@@ -213,7 +225,9 @@ class UsersService:
                     image=record[3],
                 )
 
-                return user
+            await self._aconn.commit()
+
+            return user
         else:
             return await self.get_user_by_id(id=user_id)
 

@@ -11,18 +11,18 @@ class ProfilesService:
         self._users_service = users_service
         self._follows_table = "follows"
 
-    async def get_profile_by_username(
-        self, username: str, follower_id: Optional[str] = None
+    async def get_profile_by_id(
+        self, user_id: str, follower_id: Optional[str] = None
     ) -> Profile:
-        followed = await self._users_service.get_user_by_username(username=username)
+        user = await self._users_service.get_user_by_id(id=user_id)
 
-        if not followed:
-            raise NotFoundException(f"user {username} not found")
+        if not user:
+            raise NotFoundException(f"user {user_id} not found")
 
         profile = Profile(
-            username=followed.username,
-            bio=followed.bio,
-            image=followed.image,
+            username=user.username,
+            bio=user.bio,
+            image=user.image,
             following=False,
         )
 
@@ -33,10 +33,20 @@ class ProfilesService:
                 raise NotFoundException(f"follower {follower_id} not found")
 
             profile.following = await self._is_following(
-                follower_id=follower.id, followed_id=followed.id
+                follower_id=follower.id, followed_id=user.id
             )
 
         return profile
+
+    async def get_profile_by_username(
+        self, username: str, follower_id: Optional[str] = None
+    ) -> Profile:
+        user = await self._users_service.get_user_by_username(username=username)
+
+        if not user:
+            raise NotFoundException(f"username {username} not found")
+
+        return await self.get_profile_by_id(user_id=user.id, follower_id=follower_id)
 
     async def follow_user_by_username(
         self, follower_id: str, followed_username: str
@@ -52,21 +62,27 @@ class ProfilesService:
             follow_user_query = f"""
                 INSERT INTO {self._follows_table} (follower_id, followed_id)
                 VALUES (%(follower_id)s, %(followed_id)s)
-                ON CONFLICT(follower_id, followed_id)
+                ON CONFLICT(follower_id, followed_id) WHERE deleted_at IS NOT NULL
                 DO UPDATE SET deleted_at = NULL;
             """
 
-            await acur.execute(
-                follow_user_query,
-                {"follower_id": follower_id, "followed_id": followed.id},
-            )
+            try:
+                await acur.execute(
+                    follow_user_query,
+                    {"follower_id": follower_id, "followed_id": followed.id},
+                )
+            except Exception as e:
+                await self._aconn.rollback()
+                raise e
 
-            return Profile(
-                username=followed.username,
-                bio=followed.bio,
-                image=followed.image,
-                following=True,
-            )
+        await self._aconn.commit()
+
+        return Profile(
+            username=followed.username,
+            bio=followed.bio,
+            image=followed.image,
+            following=True,
+        )
 
     async def unfollow_user_by_username(
         self, follower_id: str, followed_username: str
@@ -86,20 +102,26 @@ class ProfilesService:
                 AND followed_id = %s;
             """
 
-            await acur.execute(
-                unfollow_user_query,
-                (
-                    follower_id,
-                    followed.id,
-                ),
-            )
+            try:
+                await acur.execute(
+                    unfollow_user_query,
+                    (
+                        follower_id,
+                        followed.id,
+                    ),
+                )
+            except Exception as e:
+                await self._aconn.rollback()
+                raise e
 
-            return Profile(
-                username=followed.username,
-                bio=followed.bio,
-                image=followed.image,
-                following=False,
-            )
+        await self._aconn.commit()
+
+        return Profile(
+            username=followed.username,
+            bio=followed.bio,
+            image=followed.image,
+            following=False,
+        )
 
     async def _is_following(self, follower_id: str, followed_id: str) -> bool:
         async with self._aconn.cursor() as acur:

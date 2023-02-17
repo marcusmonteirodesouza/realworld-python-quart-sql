@@ -86,7 +86,9 @@ async def test_when_user_is_not_found_and_token_is_sent_should_return_404(
 
     response_data = await response.json
 
-    assert response_data["errors"]["body"][0] == f"user {followed_username} not found"
+    assert (
+        response_data["errors"]["body"][0] == f"username {followed_username} not found"
+    )
 
 
 @pytest.mark.asyncio
@@ -105,7 +107,9 @@ async def test_when_user_is_not_found_and_token_is_not_sent_should_return_404(
 
     response_data = await response.json
 
-    assert response_data["errors"]["body"][0] == f"user {followed_username} not found"
+    assert (
+        response_data["errors"]["body"][0] == f"username {followed_username} not found"
+    )
 
 
 @pytest.mark.asyncio

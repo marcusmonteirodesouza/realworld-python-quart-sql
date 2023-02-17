@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS articles(
   body TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
-  deleted_at TIMESTAMP WITH TIME ZONE
+  deleted_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp
 );
 
 CREATE TABLE IF NOT EXISTS tags(
@@ -37,10 +37,7 @@ CREATE TABLE IF NOT EXISTS tags(
 );
 
 CREATE TABLE IF NOT EXISTS articles_tags(
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   article_id UUID references articles(id),
   tag_id UUID references tags(id),
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
-  deleted_at TIMESTAMP WITH TIME ZONE,
   UNIQUE(article_id, tag_id)
 );

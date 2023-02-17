@@ -14,6 +14,7 @@ quart-schema = "^0.14.3"
 validators = "^0.20.0"
 hypercorn = "^0.14.3"
 quart-jwt-extended = "^0.1.0"
+awesome-slugify = "^1.6.5"
 
 
 [tool.poetry.group.dev.dependencies]
