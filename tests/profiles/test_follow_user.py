@@ -122,6 +122,24 @@ async def test_when_user_is_not_found_should_return_404(app, create_user):
 
 
 @pytest.mark.asyncio
+async def test_when_user_tries_to_follow_himself_should_return_422(app, create_user):
+    client = app.test_client()
+
+    follower = await create_user()
+
+    response = await client.post(
+        make_follow_user_url(username=follower.username),
+        headers={"Authorization": f"Token {follower.token}"},
+    )
+
+    assert response.status_code == 422
+
+    response_data = await response.json
+
+    assert response_data["errors"]["body"][0] == f"user cannot follow him/herself"
+
+
+@pytest.mark.asyncio
 async def test_when_authorization_header_is_not_set_should_return_401(app, create_user):
     client = app.test_client()
 

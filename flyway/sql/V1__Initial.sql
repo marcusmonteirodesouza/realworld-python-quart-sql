@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS follows(
   followed_id UUID references users(id),
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
   deleted_at TIMESTAMP WITH TIME ZONE,
-  UNIQUE(follower_id, followed_id)
+  UNIQUE(follower_id, followed_id),
+  CHECK(follower_id <> followed_id)
 );
 
 CREATE TABLE IF NOT EXISTS articles(

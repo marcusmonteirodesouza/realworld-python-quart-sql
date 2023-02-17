@@ -58,6 +58,9 @@ class ProfilesService:
         if not followed:
             raise NotFoundException(f"username {followed_username} not found")
 
+        if follower_id == followed.id:
+            raise ValueError("user cannot follow him/herself")
+
         async with self._aconn.cursor() as acur:
             follow_user_query = f"""
                 INSERT INTO {self._follows_table} (follower_id, followed_id)

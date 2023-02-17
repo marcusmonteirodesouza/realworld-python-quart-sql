@@ -1,7 +1,7 @@
 import datetime
 import psycopg
 from typing import List, Optional
-from slugify import slugify_url
+from slugify import slugify
 from .article import Article
 
 
@@ -28,7 +28,9 @@ class ArticlesService:
                 RETURNING id, created_at, updated_at;
             """
 
-            slug = slugify_url(f"{title}-{int(datetime.datetime.utcnow().timestamp())}")
+            slug = self._slugify(
+                f"{title}-{int(datetime.datetime.utcnow().timestamp())}"
+            )
 
             try:
                 await acur.execute(
@@ -54,7 +56,7 @@ class ArticlesService:
             )
 
             if tags and len(tags) > 0:
-                await self._overwrite_articles_tags(
+                article.tags = await self._overwrite_articles_tags(
                     acur=acur, article_id=article.id, tags=tags
                 )
 
@@ -81,7 +83,7 @@ class ArticlesService:
 
     async def _overwrite_articles_tags(
         self, acur: psycopg.AsyncCursor, article_id: str, tags: List[str]
-    ):
+    ) -> List[str]:
         delete_articles_tags_query = f"""
             DELETE FROM {self._articles_tags_table}
             WHERE article_id = %s;
@@ -93,7 +95,7 @@ class ArticlesService:
             await self._aconn.rollback()
             raise e
 
-        tags = [tag.strip().lower() for tag in tags]
+        tags = sorted([self._slugify(tag) for tag in tags])
 
         insert_tags_query = f"""
             INSERT INTO {self._tags_table} (name)
@@ -103,7 +105,7 @@ class ArticlesService:
             RETURNING id;
         """
 
-        insert_tags_params_seq = [(name.strip().lower(),) for name in tags]
+        insert_tags_params_seq = [(tag,) for tag in tags]
 
         try:
             await acur.executemany(
@@ -141,3 +143,9 @@ class ArticlesService:
         except Exception as e:
             await self._aconn.rollback()
             raise e
+
+        return tags
+
+    @staticmethod
+    def _slugify(string: str) -> str:
+        return slugify(string.strip().lower())
