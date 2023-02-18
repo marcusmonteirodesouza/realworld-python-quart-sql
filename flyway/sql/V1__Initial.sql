@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS articles(
   body TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
-  deleted_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp
+  deleted_at TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE IF NOT EXISTS tags(
@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS tags(
 CREATE TABLE IF NOT EXISTS articles_tags(
   article_id UUID references articles(id),
   tag_id UUID references tags(id),
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
   UNIQUE(article_id, tag_id)
 );
 

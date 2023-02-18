@@ -78,6 +78,249 @@ async def test_when_all_data_is_set_should_return_200(
 
 
 @pytest.mark.asyncio
+async def test_when_title_is_set_should_return_200(
+    app, faker, create_user, create_article, get_article
+):
+    client = app.test_client()
+
+    author = await create_user()
+
+    article = await create_article(author_token=author.token)
+
+    data = {
+        "article": {
+            "title": "I'm changing the title here!",
+        }
+    }
+
+    response = await client.put(
+        make_update_article_url(slug=article.slug),
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {author.token}",
+        },
+    )
+
+    assert response.status_code == 200
+
+    response_data = await response.json
+
+    updated_article = response_data["article"]
+
+    assert re.match(r"im-changing-the-title-here-\S+", updated_article["slug"])
+    assert updated_article["title"] == data["article"]["title"]
+    created_at = datetime.datetime.fromisoformat(updated_article["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(updated_article["updatedAt"])
+    assert updated_at > created_at
+
+    got_article = await get_article(slug=updated_article["slug"])
+
+    assert updated_article["title"] == got_article.title
+    assert updated_article["description"] == got_article.description
+    assert updated_article["body"] == got_article.body
+    assert updated_article["tagList"] == got_article.tag_list
+    assert created_at == got_article.created_at
+    assert updated_at == got_article.updated_at
+
+
+@pytest.mark.asyncio
+async def test_when_description_is_set_should_return_200(
+    app, faker, create_user, create_article, get_article
+):
+    client = app.test_client()
+
+    author = await create_user()
+
+    article = await create_article(author_token=author.token)
+
+    data = {
+        "article": {
+            "description": faker.sentence(),
+        }
+    }
+
+    response = await client.put(
+        make_update_article_url(slug=article.slug),
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {author.token}",
+        },
+    )
+
+    assert response.status_code == 200
+
+    response_data = await response.json
+
+    updated_article = response_data["article"]
+
+    assert updated_article["slug"] == article.slug
+    assert updated_article["description"] == data["article"]["description"]
+    created_at = datetime.datetime.fromisoformat(updated_article["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(updated_article["updatedAt"])
+    assert updated_at > created_at
+
+    got_article = await get_article(slug=updated_article["slug"])
+
+    assert updated_article["title"] == got_article.title
+    assert updated_article["description"] == got_article.description
+    assert updated_article["body"] == got_article.body
+    assert updated_article["tagList"] == got_article.tag_list
+    assert created_at == got_article.created_at
+    assert updated_at == got_article.updated_at
+
+
+@pytest.mark.asyncio
+async def test_when_body_is_set_should_return_200(
+    app, faker, create_user, create_article, get_article
+):
+    client = app.test_client()
+
+    author = await create_user()
+
+    article = await create_article(author_token=author.token)
+
+    data = {
+        "article": {
+            "body": faker.paragraph(),
+        }
+    }
+
+    response = await client.put(
+        make_update_article_url(slug=article.slug),
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {author.token}",
+        },
+    )
+
+    assert response.status_code == 200
+
+    response_data = await response.json
+
+    updated_article = response_data["article"]
+
+    assert updated_article["slug"] == article.slug
+    assert updated_article["body"] == data["article"]["body"]
+    created_at = datetime.datetime.fromisoformat(updated_article["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(updated_article["updatedAt"])
+    assert updated_at > created_at
+
+    got_article = await get_article(slug=updated_article["slug"])
+
+    assert updated_article["title"] == got_article.title
+    assert updated_article["description"] == got_article.description
+    assert updated_article["body"] == got_article.body
+    assert updated_article["tagList"] == got_article.tag_list
+    assert created_at == got_article.created_at
+    assert updated_at == got_article.updated_at
+
+
+@pytest.mark.asyncio
+async def test_when_tagList_is_set_should_return_200(
+    app, faker, create_user, create_article, get_article
+):
+    client = app.test_client()
+
+    author = await create_user()
+
+    article = await create_article(author_token=author.token)
+
+    data = {
+        "article": {
+            "tagList": [
+                "training",
+                "dragons",
+                " some spaces ",
+                "repeated",
+                "repeated",
+                "123",
+            ],
+        }
+    }
+
+    response = await client.put(
+        make_update_article_url(slug=article.slug),
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {author.token}",
+        },
+    )
+
+    assert response.status_code == 200
+
+    response_data = await response.json
+
+    updated_article = response_data["article"]
+
+    assert updated_article["slug"] == article.slug
+    assert updated_article["tagList"] == [
+        "123",
+        "dragons",
+        "repeated",
+        "some-spaces",
+        "training",
+    ]
+    created_at = datetime.datetime.fromisoformat(updated_article["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(updated_article["updatedAt"])
+    assert updated_at == created_at
+
+    got_article = await get_article(slug=updated_article["slug"])
+
+    assert updated_article["title"] == got_article.title
+    assert updated_article["description"] == got_article.description
+    assert updated_article["body"] == got_article.body
+    assert updated_article["tagList"] == got_article.tag_list
+    assert created_at == got_article.created_at
+    assert updated_at == got_article.updated_at
+
+
+@pytest.mark.asyncio
+async def test_when_no_data_is_set_should_return_200(
+    app, faker, create_user, create_article, get_article
+):
+    client = app.test_client()
+
+    author = await create_user()
+
+    article = await create_article(author_token=author.token)
+
+    data = {"article": {}}
+
+    response = await client.put(
+        make_update_article_url(slug=article.slug),
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {author.token}",
+        },
+    )
+
+    assert response.status_code == 200
+
+    response_data = await response.json
+
+    updated_article = response_data["article"]
+
+    assert updated_article["slug"] == article.slug
+    created_at = datetime.datetime.fromisoformat(updated_article["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(updated_article["updatedAt"])
+    assert updated_at == created_at
+
+    got_article = await get_article(slug=updated_article["slug"])
+
+    assert updated_article["title"] == got_article.title
+    assert updated_article["description"] == got_article.description
+    assert updated_article["body"] == got_article.body
+    assert updated_article["tagList"] == got_article.tag_list
+    assert created_at == got_article.created_at
+    assert updated_at == got_article.updated_at
+
+
+@pytest.mark.asyncio
 async def test_when_article_is_not_found_should_return_400(app, faker, create_user):
     client = app.test_client()
 
