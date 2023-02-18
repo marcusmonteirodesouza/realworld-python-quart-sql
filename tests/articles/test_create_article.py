@@ -146,7 +146,7 @@ async def test_when_title_is_not_sent_should_return_400(app, faker, create_user)
         "article": {
             "description": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": faker.words(),
+            "tagList": faker.words(nb=10),
         }
     }
 
@@ -179,7 +179,7 @@ async def test_when_description_is_not_sent_should_return_400(app, faker, create
         "article": {
             "title": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": faker.words(),
+            "tagList": faker.words(nb=10),
         }
     }
 
@@ -212,7 +212,7 @@ async def test_when_body_is_not_sent_should_return_400(app, faker, create_user):
         "article": {
             "title": faker.sentence(),
             "description": faker.paragraph(),
-            "tagList": faker.words(),
+            "tagList": faker.words(nb=10),
         }
     }
 
@@ -248,7 +248,7 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_401(
             "title": faker.sentence(),
             "description": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": faker.words(),
+            "tagList": faker.words(nb=10),
         }
     }
 
@@ -281,7 +281,7 @@ async def test_when_token_has_invalid_signature_should_return_401(
             "title": faker.sentence(),
             "description": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": faker.words(),
+            "tagList": faker.words(nb=10),
         }
     }
 
@@ -316,7 +316,7 @@ async def test_when_token_is_expired_should_return_401(app, faker, create_user):
             "title": faker.sentence(),
             "description": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": faker.words(),
+            "tagList": faker.words(nb=10),
         }
     }
 
@@ -347,7 +347,7 @@ async def test_when_author_is_not_found_should_return_401(app, faker):
             "title": faker.sentence(),
             "description": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": faker.words(),
+            "tagList": faker.words(nb=10),
         }
     }
 

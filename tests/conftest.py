@@ -183,7 +183,7 @@ async def create_article(app, faker):
                 "title": faker.sentence(),
                 "description": faker.sentence(),
                 "body": faker.paragraph(),
-                "tagList": faker.words(),
+                "tagList": faker.words(nb=10),
             }
         }
 
@@ -223,3 +223,44 @@ async def create_article(app, faker):
         )
 
     yield _create_article
+
+
+@pytest_asyncio.fixture(scope="function")
+async def favorite_article(app, faker):
+    async def _favorite_article(user_token: str, article_slug: str) -> Article:
+        client = app.test_client()
+
+        response = await client.post(
+            f"/articles/{article_slug}/favorite",
+            headers={
+                "Authorization": f"Token {user_token}",
+            },
+        )
+
+        assert response.status_code == 200
+
+        response_data = await response.json
+
+        article_data = response_data["article"]
+
+        author_data = article_data["author"]
+
+        return Article(
+            slug=article_data["slug"],
+            title=article_data["title"],
+            description=article_data["description"],
+            body=article_data["body"],
+            tag_list=article_data["tagList"],
+            created_at=datetime.datetime.fromisoformat(article_data["createdAt"]),
+            updated_at=datetime.datetime.fromisoformat(article_data["updatedAt"]),
+            favorited=article_data["favorited"],
+            favorites_count=article_data["favoritesCount"],
+            author=AuthorProfile(
+                username=author_data["username"],
+                bio=author_data["bio"],
+                image=author_data["image"],
+                following=author_data["following"],
+            ),
+        )
+
+    yield _favorite_article

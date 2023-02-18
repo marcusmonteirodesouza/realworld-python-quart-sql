@@ -145,7 +145,8 @@ class ArticlesService:
             SELECT t.name
             FROM {self._tags_table} t, {self._articles_tags_table} at
             WHERE t.id = at.tag_id
-            AND at.article_id = %s;
+            AND at.article_id = %s
+            ORDER BY t.name;
         """
 
         await acur.execute(get_articles_tags_query, (article_id,))
