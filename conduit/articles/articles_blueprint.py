@@ -78,10 +78,16 @@ async def get_article(slug: str) -> (ArticleResponse, int):
         if not user:
             raise UnauthorizedException(f"user {username} not found")
 
+        is_favorite = await current_app.articles_service.is_favorite(
+            article_id=article.id, user_id=user.id
+        )
+
         author_profile = await current_app.profiles_service.get_profile_by_user_id(
             user_id=article.author_id, follower_id=user.id
         )
     else:
+        is_favorite = False
+
         author_profile = await current_app.profiles_service.get_profile_by_user_id(
             user_id=article.author_id
         )
@@ -96,7 +102,7 @@ async def get_article(slug: str) -> (ArticleResponse, int):
                 tag_list=article.tags,
                 created_at=article.created_at,
                 updated_at=article.updated_at,
-                favorited=True,
+                favorited=is_favorite,
                 favorites_count=article.favorites_count,
                 author=ArticleResponseArticleAuthorProfile(
                     username=author_profile.username,

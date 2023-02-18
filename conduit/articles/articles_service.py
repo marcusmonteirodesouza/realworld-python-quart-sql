@@ -134,7 +134,7 @@ class ArticlesService:
                 );
             """
 
-            await acur.execute(is_following_query, (user_id, article_id))
+            await acur.execute(is_following_query, (article_id, user_id))
 
             record = await acur.fetchone()
 
@@ -199,7 +199,9 @@ class ArticlesService:
 
         insert_articles_tags_query = f"""
             INSERT INTO {self._articles_tags_table} (article_id, tag_id)
-            VALUES (%s, %s);
+            VALUES (%s, %s)
+            ON CONFLICT (article_id, tag_id)
+            DO NOTHING;
         """
 
         insert_articles_tags_params_seq = [
