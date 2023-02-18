@@ -3,6 +3,7 @@ import psycopg
 from typing import List, Optional
 from slugify import slugify
 from .article import Article
+from ..exceptions import NotFoundException
 
 
 class ArticlesService:
@@ -64,13 +65,71 @@ class ArticlesService:
 
         return article
 
-    async def is_favorite(self, user_id: str, article_id: str) -> bool:
+    async def get_article_by_slug(self, slug: str) -> Optional[Article]:
+        async with self._aconn.cursor() as acur:
+            get_article_by_slug_query = f"""
+                SELECT id, author_id, title, description, body, created_at, updated_at
+                FROM {self._articles_table}
+                WHERE slug = %s;
+            """
+
+            await acur.execute(get_article_by_slug_query, (slug,))
+
+            record = await acur.fetchone()
+
+            if not record:
+                raise NotFoundException(f"article with slug {slug} not found")
+
+            article_id = record[0]
+
+            tags = await self._get_articles_tags(acur=acur, article_id=article_id)
+
+            favorites_count = await self._get_favorites_count(
+                acur=acur, article_id=article_id
+            )
+
+            return Article(
+                id=article_id,
+                author_id=record[1],
+                slug=slug,
+                title=record[2],
+                description=record[3],
+                body=record[4],
+                tags=tags,
+                created_at=record[5],
+                updated_at=record[6],
+                favorites_count=favorites_count,
+            )
+
+    async def favorite_article_by_slug(self, slug: str, user_id: str):
+        article = await self.get_article_by_slug(slug=slug)
+
+        if not article:
+            raise NotFoundException(f"article with slug {slug} not found")
+
+        async with self._aconn.cursor() as acur:
+            favorite_article_query = f"""
+                INSERT INTO {self._favorites_table} (article_id, user_id)
+                VALUES (%s, %s)
+                ON CONFLICT(article_id, user_id) WHERE deleted_at IS NOT NULL
+                DO UPDATE SET deleted_at = NULL;
+            """
+
+            try:
+                await acur.execute(favorite_article_query, (article.id, user_id))
+            except Exception as e:
+                await self._aconn.rollback()
+                raise e
+
+        await self._aconn.commit()
+
+    async def is_favorite(self, article_id: str, user_id: str) -> bool:
         async with self._aconn.cursor() as acur:
             is_following_query = f"""
                 SELECT EXISTS(
                     SELECT 1 FROM {self._favorites_table}
-                    WHERE user_id = %s
-                    AND article_id = %s
+                    WHERE article_id = %s
+                    AND user_id = %s
                     AND deleted_at IS NULL
                 );
             """
@@ -80,6 +139,20 @@ class ArticlesService:
             record = await acur.fetchone()
 
             return record[0]
+
+    async def _get_articles_tags(self, acur: psycopg.AsyncCursor, article_id):
+        get_articles_tags_query = f"""
+            SELECT t.name
+            FROM {self._tags_table} t, {self._articles_tags_table} at
+            WHERE t.id = at.tag_id
+            AND at.article_id = %s;
+        """
+
+        await acur.execute(get_articles_tags_query, (article_id,))
+
+        records = await acur.fetchall()
+
+        return [r[0] for r in records]
 
     async def _overwrite_articles_tags(
         self, acur: psycopg.AsyncCursor, article_id: str, tags: List[str]
@@ -145,6 +218,19 @@ class ArticlesService:
             raise e
 
         return tags
+
+    async def _get_favorites_count(self, acur: psycopg.AsyncCursor, article_id) -> int:
+        get_favorites_count_query = f"""
+            SELECT COUNT(*)
+            FROM {self._favorites_table}
+            WHERE article_id = %s;
+        """
+
+        await acur.execute(get_favorites_count_query, (article_id,))
+
+        record = await acur.fetchone()
+
+        return record[0]
 
     @staticmethod
     def _slugify(string: str) -> str:

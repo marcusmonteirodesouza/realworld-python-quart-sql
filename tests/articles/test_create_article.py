@@ -43,7 +43,7 @@ async def test_should_return_201(app, faker, create_user):
     assert re.match(r"how-to-train-your-dragon-\d+", article["slug"])
     assert article["title"] == data["article"]["title"]
     assert article["description"] == data["article"]["description"]
-    assert article["description"] == data["article"]["description"]
+    assert article["body"] == data["article"]["body"]
     assert article["tagList"] == ["dragons", "some-spaces", "training"]
     created_at = datetime.datetime.fromisoformat(article["createdAt"])
     updated_at = datetime.datetime.fromisoformat(article["updatedAt"])
@@ -93,7 +93,7 @@ async def test_when_tagList_is_not_sent_should_return_201(app, faker, create_use
     assert validators.slug(article["slug"])
     assert article["title"] == data["article"]["title"]
     assert article["description"] == data["article"]["description"]
-    assert article["description"] == data["article"]["description"]
+    assert article["body"] == data["article"]["body"]
     assert article["tagList"] == []
     created_at = datetime.datetime.fromisoformat(article["createdAt"])
     updated_at = datetime.datetime.fromisoformat(article["updatedAt"])

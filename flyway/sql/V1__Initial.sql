@@ -42,3 +42,12 @@ CREATE TABLE IF NOT EXISTS articles_tags(
   tag_id UUID references tags(id),
   UNIQUE(article_id, tag_id)
 );
+
+CREATE TABLE IF NOT EXISTS favorites(
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  article_id UUID references articles(id),
+  user_id UUID references users(id),
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
+  deleted_at TIMESTAMP WITH TIME ZONE,
+  UNIQUE(article_id, user_id)
+);

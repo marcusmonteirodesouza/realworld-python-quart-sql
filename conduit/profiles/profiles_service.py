@@ -11,7 +11,7 @@ class ProfilesService:
         self._users_service = users_service
         self._follows_table = "follows"
 
-    async def get_profile_by_id(
+    async def get_profile_by_user_id(
         self, user_id: str, follower_id: Optional[str] = None
     ) -> Profile:
         user = await self._users_service.get_user_by_id(id=user_id)
@@ -46,11 +46,11 @@ class ProfilesService:
         if not user:
             raise NotFoundException(f"username {username} not found")
 
-        return await self.get_profile_by_id(user_id=user.id, follower_id=follower_id)
+        return await self.get_profile_by_user_id(
+            user_id=user.id, follower_id=follower_id
+        )
 
-    async def follow_user_by_username(
-        self, follower_id: str, followed_username: str
-    ) -> Profile:
+    async def follow_user_by_username(self, follower_id: str, followed_username: str):
         followed = await self._users_service.get_user_by_username(
             username=followed_username
         )
@@ -80,16 +80,7 @@ class ProfilesService:
 
         await self._aconn.commit()
 
-        return Profile(
-            username=followed.username,
-            bio=followed.bio,
-            image=followed.image,
-            following=True,
-        )
-
-    async def unfollow_user_by_username(
-        self, follower_id: str, followed_username: str
-    ) -> Profile:
+    async def unfollow_user_by_username(self, follower_id: str, followed_username: str):
         followed = await self._users_service.get_user_by_username(
             username=followed_username
         )
@@ -118,13 +109,6 @@ class ProfilesService:
                 raise e
 
         await self._aconn.commit()
-
-        return Profile(
-            username=followed.username,
-            bio=followed.bio,
-            image=followed.image,
-            following=False,
-        )
 
     async def _is_following(self, follower_id: str, followed_id: str) -> bool:
         async with self._aconn.cursor() as acur:
