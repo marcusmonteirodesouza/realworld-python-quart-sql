@@ -3,7 +3,8 @@ import psycopg
 from typing import List, Optional
 from slugify import slugify
 from .article import Article
-from ..exceptions import NotFoundException
+from .update_article_params import UpdateArticleParams
+from ..exceptions import NotFoundException, AlreadyExistsException
 
 
 class ArticlesService:
@@ -65,6 +66,40 @@ class ArticlesService:
 
         return article
 
+    async def get_article_by_id(self, article_id: str) -> Optional[Article]:
+        async with self._aconn.cursor() as acur:
+            get_article_by_slug_query = f"""
+                SELECT author_id, slug, title, description, body, created_at, updated_at
+                FROM {self._articles_table}
+                WHERE id = %s;
+            """
+
+            await acur.execute(get_article_by_slug_query, (article_id,))
+
+            record = await acur.fetchone()
+
+            if not record:
+                raise NotFoundException(f"article {article_id} not found")
+
+            tags = await self._get_articles_tags(acur=acur, article_id=article_id)
+
+            favorites_count = await self._get_favorites_count(
+                acur=acur, article_id=article_id
+            )
+
+            return Article(
+                id=article_id,
+                author_id=record[0],
+                slug=record[1],
+                title=record[2],
+                description=record[3],
+                body=record[4],
+                tags=tags,
+                created_at=record[5],
+                updated_at=record[6],
+                favorites_count=favorites_count,
+            )
+
     async def get_article_by_slug(self, slug: str) -> Optional[Article]:
         async with self._aconn.cursor() as acur:
             get_article_by_slug_query = f"""
@@ -100,6 +135,84 @@ class ArticlesService:
                 updated_at=record[6],
                 favorites_count=favorites_count,
             )
+
+    async def update_article_by_slug(
+        self, slug: str, params: UpdateArticleParams
+    ) -> Article:
+        article = await self.get_article_by_slug(slug=slug)
+
+        if not article:
+            raise NotFoundException(f"slug {slug} not found")
+
+        initial_update_article_query = f"UPDATE {self._articles_table}"
+
+        update_article_query = initial_update_article_query
+
+        query_params = {"id": article.id}
+
+        if params.title:
+            if update_article_query == initial_update_article_query:
+                update_article_query = f"{update_article_query} SET username = %(username)s, slug = %(slug)s"
+            else:
+                update_article_query = (
+                    f"{update_article_query}, username = %(username)s, slug = %(slug)s"
+                )
+
+            query_params["title"] = params.title
+            query_params["slug"] = self._slugify(string=params.title)
+
+        if params.description:
+            if update_article_query == initial_update_article_query:
+                update_article_query = (
+                    f"{update_article_query} SET description = %(description)s"
+                )
+            else:
+                update_article_query = (
+                    f"{update_article_query}, description = %(description)s"
+                )
+
+            query_params["description"] = params.description
+
+        if params.body:
+            if update_article_query == initial_update_article_query:
+                update_article_query = f"{update_article_query} SET body = %(body)s"
+            else:
+                update_article_query = f"{update_article_query}, body = %(body)s"
+
+            query_params["body"] = params.body
+
+        if params.tags:
+            if update_article_query == initial_update_article_query:
+                update_article_query = f"{update_article_query} SET tags = %(bio)s"
+            else:
+                update_article_query = f"{update_article_query}, bio = %(bio)s"
+
+            query_params["bio"] = params.bio
+
+        async with self._aconn.cursor() as acur:
+            if update_article_query != initial_update_article_query:
+                update_article_query = f"""
+                    {update_article_query}, updated_at = current_timestamp
+                    WHERE id = %(id)s;
+                """
+
+                try:
+                    await acur.execute(
+                        update_article_query,
+                        params=query_params,
+                    )
+                except Exception as e:
+                    await self._aconn.rollback()
+                    raise e
+
+            if params.tags:
+                await self._overwrite_articles_tags(
+                    acur=acur, article_id=article.id, tags=params.tags
+                )
+
+        await self._aconn.commit()
+
+        return await self.get_article_by_id(article_id=article.id)
 
     async def favorite_article_by_slug(self, slug: str, user_id: str):
         article = await self.get_article_by_slug(slug=slug)
