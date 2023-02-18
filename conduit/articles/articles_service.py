@@ -1,10 +1,10 @@
-import datetime
 import psycopg
+import shortuuid
 from typing import List, Optional
 from slugify import slugify
 from .article import Article
 from .update_article_params import UpdateArticleParams
-from ..exceptions import NotFoundException, AlreadyExistsException
+from ..exceptions import NotFoundException
 
 
 class ArticlesService:
@@ -30,9 +30,7 @@ class ArticlesService:
                 RETURNING id, created_at, updated_at;
             """
 
-            slug = self._slugify(
-                f"{title}-{int(datetime.datetime.utcnow().timestamp())}"
-            )
+            slug = self._slugify_title(title=title)
 
             try:
                 await acur.execute(
@@ -113,7 +111,7 @@ class ArticlesService:
             record = await acur.fetchone()
 
             if not record:
-                raise NotFoundException(f"article with slug {slug} not found")
+                raise NotFoundException(f"slug {slug} not found")
 
             article_id = record[0]
 
@@ -152,14 +150,16 @@ class ArticlesService:
 
         if params.title:
             if update_article_query == initial_update_article_query:
-                update_article_query = f"{update_article_query} SET username = %(username)s, slug = %(slug)s"
+                update_article_query = (
+                    f"{update_article_query} SET title = %(title)s, slug = %(slug)s"
+                )
             else:
                 update_article_query = (
-                    f"{update_article_query}, username = %(username)s, slug = %(slug)s"
+                    f"{update_article_query}, title = %(title)s, slug = %(slug)s"
                 )
 
             query_params["title"] = params.title
-            query_params["slug"] = self._slugify(string=params.title)
+            query_params["slug"] = self._slugify_title(title=params.title)
 
         if params.description:
             if update_article_query == initial_update_article_query:
@@ -180,14 +180,6 @@ class ArticlesService:
                 update_article_query = f"{update_article_query}, body = %(body)s"
 
             query_params["body"] = params.body
-
-        if params.tags:
-            if update_article_query == initial_update_article_query:
-                update_article_query = f"{update_article_query} SET tags = %(bio)s"
-            else:
-                update_article_query = f"{update_article_query}, bio = %(bio)s"
-
-            query_params["bio"] = params.bio
 
         async with self._aconn.cursor() as acur:
             if update_article_query != initial_update_article_query:
@@ -218,7 +210,7 @@ class ArticlesService:
         article = await self.get_article_by_slug(slug=slug)
 
         if not article:
-            raise NotFoundException(f"article with slug {slug} not found")
+            raise NotFoundException(f"slug {slug} not found")
 
         async with self._aconn.cursor() as acur:
             favorite_article_query = f"""
@@ -351,3 +343,6 @@ class ArticlesService:
     @staticmethod
     def _slugify(string: str) -> str:
         return slugify(string.strip().lower())
+
+    def _slugify_title(self, title: str) -> str:
+        return self._slugify(string=f"{title}-{shortuuid.uuid()}")

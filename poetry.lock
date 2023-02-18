@@ -1004,6 +1004,18 @@ testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8 (<5)", "flake8-202
 testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
+name = "shortuuid"
+version = "1.0.11"
+description = "A generator library for concise, unambiguous and URL-safe UUIDs."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "shortuuid-1.0.11-py3-none-any.whl", hash = "sha256:27ea8f28b1bd0bf8f15057a3ece57275d2059d2b0bb02854f02189962c13b6aa"},
+    {file = "shortuuid-1.0.11.tar.gz", hash = "sha256:fc75f2615914815a8e4cb1501b3a513745cb66ef0fd5fc6fb9f8c3fa3481f789"},
+]
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -1149,4 +1161,4 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.9"
-content-hash = "f89969165b5f2d50e28b4d6b80b3626c32c66812cd3cb8c85d627e0df34be7d3"
+content-hash = "c0a9bcc4da55bae87668e49ca22e37b853456f0172dfb732d2aa7eb1a5145faa"
