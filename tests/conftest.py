@@ -183,7 +183,7 @@ async def create_article(app, faker):
                 "title": faker.sentence(),
                 "description": faker.sentence(),
                 "body": faker.paragraph(),
-                "tagList": faker.words(nb=10),
+                "tagList": faker.words(nb=10, unique=True),
             }
         }
 

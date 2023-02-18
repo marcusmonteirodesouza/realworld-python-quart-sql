@@ -169,7 +169,7 @@ class ArticlesService:
             await self._aconn.rollback()
             raise e
 
-        tags = sorted([self._slugify(tag) for tag in tags])
+        tags = sorted(list(dict.fromkeys([self._slugify(tag) for tag in tags])))
 
         insert_tags_query = f"""
             INSERT INTO {self._tags_table} (name)

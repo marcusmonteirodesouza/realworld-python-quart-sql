@@ -19,7 +19,7 @@ async def test_should_return_201(app, faker, create_user):
             "title": "How to train your dragon",
             "description": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": ["training", "dragons", " some spaces "],
+            "tagList": ["training", "dragons", " some spaces ", "repeated", "repeated"],
         }
     }
 
@@ -44,7 +44,7 @@ async def test_should_return_201(app, faker, create_user):
     assert article["title"] == data["article"]["title"]
     assert article["description"] == data["article"]["description"]
     assert article["body"] == data["article"]["body"]
-    assert article["tagList"] == ["dragons", "some-spaces", "training"]
+    assert article["tagList"] == ["dragons", "repeated", "some-spaces", "training"]
     created_at = datetime.datetime.fromisoformat(article["createdAt"])
     updated_at = datetime.datetime.fromisoformat(article["updatedAt"])
     assert created_at == updated_at
@@ -146,7 +146,7 @@ async def test_when_title_is_not_sent_should_return_400(app, faker, create_user)
         "article": {
             "description": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": faker.words(nb=10),
+            "tagList": faker.words(nb=10, unique=True),
         }
     }
 
@@ -179,7 +179,7 @@ async def test_when_description_is_not_sent_should_return_400(app, faker, create
         "article": {
             "title": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": faker.words(nb=10),
+            "tagList": faker.words(nb=10, unique=True),
         }
     }
 
@@ -212,7 +212,7 @@ async def test_when_body_is_not_sent_should_return_400(app, faker, create_user):
         "article": {
             "title": faker.sentence(),
             "description": faker.paragraph(),
-            "tagList": faker.words(nb=10),
+            "tagList": faker.words(nb=10, unique=True),
         }
     }
 
@@ -248,7 +248,7 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_401(
             "title": faker.sentence(),
             "description": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": faker.words(nb=10),
+            "tagList": faker.words(nb=10, unique=True),
         }
     }
 
@@ -281,7 +281,7 @@ async def test_when_token_has_invalid_signature_should_return_401(
             "title": faker.sentence(),
             "description": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": faker.words(nb=10),
+            "tagList": faker.words(nb=10, unique=True),
         }
     }
 
@@ -316,7 +316,7 @@ async def test_when_token_is_expired_should_return_401(app, faker, create_user):
             "title": faker.sentence(),
             "description": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": faker.words(nb=10),
+            "tagList": faker.words(nb=10, unique=True),
         }
     }
 
@@ -347,7 +347,7 @@ async def test_when_author_is_not_found_should_return_401(app, faker):
             "title": faker.sentence(),
             "description": faker.sentence(),
             "body": faker.paragraph(),
-            "tagList": faker.words(nb=10),
+            "tagList": faker.words(nb=10, unique=True),
         }
     }
 
