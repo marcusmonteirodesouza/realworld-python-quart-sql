@@ -24,8 +24,12 @@ async def follow_user(username: str) -> (ProfileResponse, int):
         f"received follow user request. follower_id: {follower.id}, followed_username: {username}"
     )
 
-    profile = await current_app.profiles_service.follow_user_by_username(
+    await current_app.profiles_service.follow_user_by_username(
         follower_id=follower.id, followed_username=username
+    )
+
+    profile = await current_app.profiles_service.get_profile_by_username(
+        username=username, follower_id=follower.id
     )
 
     return ProfileResponse(
@@ -87,8 +91,12 @@ async def unfollow_user(username: str) -> (ProfileResponse, int):
         f"received unfollow user request. follower_id: {follower.id}, followed_username: {username}"
     )
 
-    profile = await current_app.profiles_service.unfollow_user_by_username(
+    await current_app.profiles_service.unfollow_user_by_username(
         follower_id=follower.id, followed_username=username
+    )
+
+    profile = await current_app.profiles_service.get_profile_by_username(
+        username=username, follower_id=follower.id
     )
 
     return ProfileResponse(
