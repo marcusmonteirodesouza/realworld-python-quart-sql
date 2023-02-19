@@ -266,7 +266,7 @@ async def test_when_tagList_is_set_should_return_200(
     ]
     created_at = datetime.datetime.fromisoformat(updated_article["createdAt"])
     updated_at = datetime.datetime.fromisoformat(updated_article["updatedAt"])
-    assert updated_at == created_at
+    assert updated_at > created_at
 
     got_article = await get_article_and_decode(slug=updated_article["slug"])
 

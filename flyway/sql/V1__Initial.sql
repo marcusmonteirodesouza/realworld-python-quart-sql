@@ -26,23 +26,12 @@ CREATE TABLE IF NOT EXISTS articles(
   title TEXT NOT NULL,
   description TEXT NOT NULL,
   body TEXT NOT NULL,
+  tags TEXT[],
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
   deleted_at TIMESTAMP WITH TIME ZONE
 );
 
-CREATE TABLE IF NOT EXISTS tags(
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL UNIQUE,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp
-);
-
-CREATE TABLE IF NOT EXISTS articles_tags(
-  article_id UUID references articles(id),
-  tag_id UUID references tags(id),
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
-  UNIQUE(article_id, tag_id)
-);
 
 CREATE TABLE IF NOT EXISTS favorites(
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

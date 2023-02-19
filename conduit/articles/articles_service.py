@@ -25,16 +25,18 @@ class ArticlesService:
     ) -> Article:
         async with self._aconn.cursor() as acur:
             insert_user_query = f"""
-                INSERT INTO {self._articles_table} (author_id, slug, title, description, body)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO {self._articles_table} (author_id, slug, title, description, body, tags)
+                VALUES (%s, %s, %s, %s, %s, %s)
                 RETURNING id, created_at, updated_at;
             """
 
             slug = self._slugify_title(title=title)
 
+            tags = self._slugify_tags(tags=tags) if tags else []
+
             try:
                 await acur.execute(
-                    insert_user_query, (author_id, slug, title, description, body)
+                    insert_user_query, (author_id, slug, title, description, body, tags)
                 )
             except Exception as e:
                 await self._aconn.rollback()
@@ -49,16 +51,11 @@ class ArticlesService:
                 title=title,
                 description=description,
                 body=body,
-                tags=tags if tags else [],
+                tags=tags,
                 created_at=record[1],
                 updated_at=record[2],
                 favorites_count=0,
             )
-
-            if len(article.tags) > 0:
-                article.tags = await self._overwrite_articles_tags(
-                    acur=acur, article_id=article.id, tags=tags
-                )
 
         await self._aconn.commit()
 
@@ -66,21 +63,19 @@ class ArticlesService:
 
     async def get_article_by_id(self, article_id: str) -> Optional[Article]:
         async with self._aconn.cursor() as acur:
-            get_article_by_slug_query = f"""
-                SELECT author_id, slug, title, description, body, created_at, updated_at
+            get_article_by_id_query = f"""
+                SELECT author_id, slug, title, description, body, tags, created_at, updated_at
                 FROM {self._articles_table}
                 WHERE id = %s
                 AND deleted_at IS NULL;
             """
 
-            await acur.execute(get_article_by_slug_query, (article_id,))
+            await acur.execute(get_article_by_id_query, (article_id,))
 
             record = await acur.fetchone()
 
             if not record:
                 raise NotFoundException(f"article {article_id} not found")
-
-            tags = await self._get_articles_tags(acur=acur, article_id=article_id)
 
             favorites_count = await self._get_favorites_count(
                 acur=acur, article_id=article_id
@@ -93,16 +88,16 @@ class ArticlesService:
                 title=record[2],
                 description=record[3],
                 body=record[4],
-                tags=tags,
-                created_at=record[5],
-                updated_at=record[6],
+                tags=record[5],
+                created_at=record[6],
+                updated_at=record[7],
                 favorites_count=favorites_count,
             )
 
     async def get_article_by_slug(self, slug: str) -> Optional[Article]:
         async with self._aconn.cursor() as acur:
             get_article_by_slug_query = f"""
-                SELECT id, author_id, title, description, body, created_at, updated_at
+                SELECT id, author_id, title, description, body, tags, created_at, updated_at
                 FROM {self._articles_table}
                 WHERE slug = %s
                 AND deleted_at IS NULL;
@@ -117,8 +112,6 @@ class ArticlesService:
 
             article_id = record[0]
 
-            tags = await self._get_articles_tags(acur=acur, article_id=article_id)
-
             favorites_count = await self._get_favorites_count(
                 acur=acur, article_id=article_id
             )
@@ -130,9 +123,9 @@ class ArticlesService:
                 title=record[2],
                 description=record[3],
                 body=record[4],
-                tags=tags,
-                created_at=record[5],
-                updated_at=record[6],
+                tags=record[5],
+                created_at=record[6],
+                updated_at=record[7],
                 favorites_count=favorites_count,
             )
 
@@ -183,6 +176,14 @@ class ArticlesService:
 
             query_params["body"] = params.body
 
+        if params.tags:
+            if update_article_query == initial_update_article_query:
+                update_article_query = f"{update_article_query} SET tags = %(tags)s"
+            else:
+                update_article_query = f"{update_article_query}, tags = %(tags)s"
+
+            query_params["tags"] = self._slugify_tags(tags=params.tags)
+
         async with self._aconn.cursor() as acur:
             if update_article_query != initial_update_article_query:
                 update_article_query = f"""
@@ -199,11 +200,6 @@ class ArticlesService:
                 except Exception as e:
                     await self._aconn.rollback()
                     raise e
-
-            if params.tags:
-                await self._overwrite_articles_tags(
-                    acur=acur, article_id=article.id, tags=params.tags
-                )
 
         await self._aconn.commit()
 
@@ -269,88 +265,6 @@ class ArticlesService:
 
             return record[0]
 
-    async def _get_articles_tags(self, acur: psycopg.AsyncCursor, article_id):
-        get_articles_tags_query = f"""
-            SELECT t.name
-            FROM {self._tags_table} t, {self._articles_tags_table} at
-            WHERE t.id = at.tag_id
-            AND at.article_id = %s
-            ORDER BY t.name;
-        """
-
-        await acur.execute(get_articles_tags_query, (article_id,))
-
-        records = await acur.fetchall()
-
-        return [r[0] for r in records]
-
-    async def _overwrite_articles_tags(
-        self, acur: psycopg.AsyncCursor, article_id: str, tags: List[str]
-    ) -> List[str]:
-        delete_articles_tags_query = f"""
-            DELETE FROM {self._articles_tags_table}
-            WHERE article_id = %s;
-        """
-
-        try:
-            await acur.execute(delete_articles_tags_query, (article_id,))
-        except Exception as e:
-            await self._aconn.rollback()
-            raise e
-
-        tags = sorted(list(dict.fromkeys([self._slugify(tag) for tag in tags])))
-
-        insert_tags_query = f"""
-            INSERT INTO {self._tags_table} (name)
-            VALUES (%s)
-            ON CONFLICT(name)
-            DO UPDATE SET name = EXCLUDED.name
-            RETURNING id;
-        """
-
-        insert_tags_params_seq = [(tag,) for tag in tags]
-
-        try:
-            await acur.executemany(
-                insert_tags_query, params_seq=insert_tags_params_seq, returning=True
-            )
-        except Exception as e:
-            await self._aconn.rollback()
-            raise e
-
-        tags_ids = []
-
-        first_record = await acur.fetchone()
-        tags_ids.append(first_record[0])
-        while acur.nextset():
-            record = await acur.fetchone()
-            tags_ids.append(record[0])
-
-        insert_articles_tags_query = f"""
-            INSERT INTO {self._articles_tags_table} (article_id, tag_id)
-            VALUES (%s, %s)
-            ON CONFLICT (article_id, tag_id)
-            DO NOTHING;
-        """
-
-        insert_articles_tags_params_seq = [
-            (
-                article_id,
-                tag_id,
-            )
-            for tag_id in tags_ids
-        ]
-
-        try:
-            await acur.executemany(
-                insert_articles_tags_query, params_seq=insert_articles_tags_params_seq
-            )
-        except Exception as e:
-            await self._aconn.rollback()
-            raise e
-
-        return tags
-
     async def _get_favorites_count(self, acur: psycopg.AsyncCursor, article_id) -> int:
         get_favorites_count_query = f"""
             SELECT COUNT(*)
@@ -371,3 +285,6 @@ class ArticlesService:
 
     def _slugify_title(self, title: str) -> str:
         return self._slugify(string=f"{title}-{shortuuid.uuid()}")
+
+    def _slugify_tags(self, tags: List[str]) -> List[str]:
+        return sorted(list(dict.fromkeys([self._slugify(string=tag) for tag in tags])))
