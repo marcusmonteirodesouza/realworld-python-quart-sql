@@ -354,6 +354,43 @@ async def test_when_article_is_not_found_should_return_400(app, faker, create_us
 
 
 @pytest.mark.asyncio
+async def test_when_user_is_not_the_author_should_return_401(
+    app, faker, create_user, create_article
+):
+    client = app.test_client()
+
+    user = await create_user()
+
+    author = await create_user()
+
+    article = await create_article(author_token=author.token)
+
+    data = {
+        "article": {
+            "title": faker.sentence(),
+            "description": faker.sentence(),
+            "body": faker.paragraph(),
+            "tagList": faker.words(nb=10),
+        }
+    }
+
+    response = await client.put(
+        make_update_article_url(slug=article.slug),
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {user.token}",
+        },
+    )
+
+    assert response.status_code == 401
+
+    response_data = await response.json
+
+    assert response_data["errors"]["body"][0] == f"unauthorized"
+
+
+@pytest.mark.asyncio
 async def test_when_authorization_header_has_invalid_scheme_should_return_401(
     app, faker, create_user, create_article
 ):

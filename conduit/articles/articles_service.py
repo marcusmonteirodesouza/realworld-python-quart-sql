@@ -136,13 +136,13 @@ class ArticlesService:
                 favorites_count=favorites_count,
             )
 
-    async def update_article_by_slug(
-        self, slug: str, params: UpdateArticleParams
+    async def update_article_by_id(
+        self, article_id: str, params: UpdateArticleParams
     ) -> Article:
-        article = await self.get_article_by_slug(slug=slug)
+        article = await self.get_article_by_id(article_id=article_id)
 
         if not article:
-            raise NotFoundException(f"slug {slug} not found")
+            raise NotFoundException(f"article {article_id} not found")
 
         initial_update_article_query = f"UPDATE {self._articles_table}"
 
@@ -208,6 +208,27 @@ class ArticlesService:
         await self._aconn.commit()
 
         return await self.get_article_by_id(article_id=article.id)
+
+    async def delete_article_by_id(self, article_id: str):
+        async with self._aconn.cursor() as acur:
+            delete_article_query = f"""
+                UPDATE {self._articles_table}
+                SET deleted_at = current_timestamp
+                WHERE id = %s
+                AND deleted_at IS NULL;
+            """
+
+            try:
+                await acur.execute(delete_article_query, (article_id,))
+            except Exception as e:
+                await self._aconn.rollback()
+                raise e
+
+            if acur.rowcount == 0:
+                await self._aconn.rollback()
+                raise NotFoundException(f"article {article_id} not found")
+
+        await self._aconn.commit()
 
     async def favorite_article_by_slug(self, slug: str, user_id: str):
         article = await self.get_article_by_slug(slug=slug)
