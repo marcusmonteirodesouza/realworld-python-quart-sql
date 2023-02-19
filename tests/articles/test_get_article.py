@@ -256,7 +256,7 @@ async def test_when_token_is_not_sent_should_return_200(
 
 
 @pytest.mark.asyncio
-async def test_when_article_is_not_found_should_return_400(app, faker):
+async def test_when_article_is_not_found_should_return_404(app, faker):
     client = app.test_client()
 
     slug = str(uuid.uuid4())

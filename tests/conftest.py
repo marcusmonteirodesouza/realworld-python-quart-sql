@@ -226,7 +226,7 @@ async def create_article(app, faker):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def get_article(app, faker):
+async def get_article(app):
     async def _get_article(slug: str, user_token: Optional[str] = None) -> Article:
         client = app.test_client()
 
@@ -239,6 +239,18 @@ async def get_article(app, faker):
             f"/articles/{slug}",
             headers=headers,
         )
+
+        return response
+
+    yield _get_article
+
+
+@pytest_asyncio.fixture(scope="function")
+async def get_article_and_decode(get_article):
+    async def _get_article_and_decode(
+        slug: str, user_token: Optional[str] = None
+    ) -> Article:
+        response = await get_article(slug=slug, user_token=user_token)
 
         assert response.status_code == 200
 
@@ -266,11 +278,11 @@ async def get_article(app, faker):
             ),
         )
 
-    yield _get_article
+    yield _get_article_and_decode
 
 
 @pytest_asyncio.fixture(scope="function")
-async def favorite_article(app, faker):
+async def favorite_article(app):
     async def _favorite_article(user_token: str, article_slug: str) -> Article:
         client = app.test_client()
 

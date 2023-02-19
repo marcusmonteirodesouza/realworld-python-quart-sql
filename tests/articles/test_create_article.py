@@ -74,7 +74,7 @@ async def test_should_return_201(app, faker, create_user):
 
 @pytest.mark.asyncio
 async def test_when_creating_article_with_same_title_as_an_existing_one_should_return_201(
-    app, faker, create_user, create_article, get_article
+    app, faker, create_user, create_article, get_article_and_decode
 ):
     client = app.test_client()
 
@@ -110,7 +110,7 @@ async def test_when_creating_article_with_same_title_as_an_existing_one_should_r
 
     assert article["title"] == existing_article.title
 
-    got_existing_article = await get_article(slug=existing_article.slug)
+    got_existing_article = await get_article_and_decode(slug=existing_article.slug)
 
     assert got_existing_article.slug == existing_article.slug
     assert article["slug"] != got_existing_article.slug
