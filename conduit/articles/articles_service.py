@@ -69,7 +69,8 @@ class ArticlesService:
             get_article_by_slug_query = f"""
                 SELECT author_id, slug, title, description, body, created_at, updated_at
                 FROM {self._articles_table}
-                WHERE id = %s;
+                WHERE id = %s
+                AND deleted_at IS NULL;
             """
 
             await acur.execute(get_article_by_slug_query, (article_id,))
@@ -103,7 +104,8 @@ class ArticlesService:
             get_article_by_slug_query = f"""
                 SELECT id, author_id, title, description, body, created_at, updated_at
                 FROM {self._articles_table}
-                WHERE slug = %s;
+                WHERE slug = %s
+                AND deleted_at IS NULL;
             """
 
             await acur.execute(get_article_by_slug_query, (slug,))
@@ -185,7 +187,8 @@ class ArticlesService:
             if update_article_query != initial_update_article_query:
                 update_article_query = f"""
                     {update_article_query}, updated_at = current_timestamp
-                    WHERE id = %(id)s;
+                    WHERE id = %(id)s
+                    AND deleted_at IS NULL;
                 """
 
                 try:
@@ -331,7 +334,8 @@ class ArticlesService:
         get_favorites_count_query = f"""
             SELECT COUNT(*)
             FROM {self._favorites_table}
-            WHERE article_id = %s;
+            WHERE article_id = %s
+            AND deleted_at IS NULL;
         """
 
         await acur.execute(get_favorites_count_query, (article_id,))
