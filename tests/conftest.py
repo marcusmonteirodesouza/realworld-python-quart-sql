@@ -226,6 +226,50 @@ async def create_article(app, faker):
 
 
 @pytest_asyncio.fixture(scope="function")
+async def get_article(app, faker):
+    async def _get_article(slug: str, user_token: Optional[str] = None) -> Article:
+        client = app.test_client()
+
+        headers = {}
+
+        if user_token:
+            headers["Authorization"] = f"Token {user_token}"
+
+        response = await client.get(
+            f"/articles/{slug}",
+            headers=headers,
+        )
+
+        assert response.status_code == 200
+
+        response_data = await response.json
+
+        article_data = response_data["article"]
+
+        author_data = article_data["author"]
+
+        return Article(
+            slug=article_data["slug"],
+            title=article_data["title"],
+            description=article_data["description"],
+            body=article_data["body"],
+            tag_list=article_data["tagList"],
+            created_at=datetime.datetime.fromisoformat(article_data["createdAt"]),
+            updated_at=datetime.datetime.fromisoformat(article_data["updatedAt"]),
+            favorited=article_data["favorited"],
+            favorites_count=article_data["favoritesCount"],
+            author=AuthorProfile(
+                username=author_data["username"],
+                bio=author_data["bio"],
+                image=author_data["image"],
+                following=author_data["following"],
+            ),
+        )
+
+    yield _get_article
+
+
+@pytest_asyncio.fixture(scope="function")
 async def favorite_article(app, faker):
     async def _favorite_article(user_token: str, article_slug: str) -> Article:
         client = app.test_client()

@@ -256,6 +256,24 @@ async def test_when_token_is_not_sent_should_return_200(
 
 
 @pytest.mark.asyncio
+async def test_when_article_is_not_found_should_return_400(app, faker):
+    client = app.test_client()
+
+    slug = str(uuid.uuid4())
+
+    response = await client.get(
+        make_get_article_url(slug=slug),
+        headers={},
+    )
+
+    assert response.status_code == 404
+
+    response_data = await response.json
+
+    assert response_data["errors"]["body"][0] == f"slug {slug} not found"
+
+
+@pytest.mark.asyncio
 async def test_when_authorization_header_has_invalid_scheme_should_return_200(
     app, faker, create_user, create_article
 ):

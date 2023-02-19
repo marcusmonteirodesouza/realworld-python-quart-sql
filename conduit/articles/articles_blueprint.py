@@ -8,6 +8,8 @@ from .article_response import (
     ArticleResponseArticleAuthorProfile,
 )
 from .create_article_request import CreateArticleRequest
+from .update_article_params import UpdateArticleParams
+from .update_article_request import UpdateArticleRequest
 from ..auth import jwt_required, jwt_optional, get_jwt_identity
 from ..exceptions import UnauthorizedException
 
@@ -109,6 +111,59 @@ async def get_article(slug: str) -> (ArticleResponse, int):
                     bio=author_profile.bio,
                     image=author_profile.image,
                     following=author_profile.following,
+                ),
+            )
+        ),
+    )
+
+
+@articles_blueprint.put(rule="/articles/<slug>")
+@jwt_required
+@validate_request(model_class=UpdateArticleRequest)
+@validate_response(model_class=ArticleResponse)
+async def update_article(
+    slug: str, data: UpdateArticleRequest
+) -> (ArticleResponse, int):
+    author_username = get_jwt_identity()
+
+    author = await current_app.users_service.get_user_by_username(
+        username=author_username
+    )
+
+    if not author:
+        raise UnauthorizedException(f"author {author_username} not found")
+
+    current_app.logger.info(
+        f"received update article request. author_id: {author.id}, data: {data}"
+    )
+
+    article = await current_app.articles_service.update_article_by_slug(
+        slug=slug,
+        params=UpdateArticleParams(
+            title=data.article.title,
+            description=data.article.description,
+            body=data.article.body,
+            tags=data.article.tag_list,
+        ),
+    )
+
+    return (
+        ArticleResponse(
+            ArticleResponseArticle(
+                slug=article.slug,
+                title=article.title,
+                description=article.description,
+                body=article.body,
+                tag_list=article.tags,
+                created_at=article.created_at,
+                updated_at=article.updated_at,
+                favorited=False,
+                favorites_count=article.favorites_count,
+                author=ArticleResponseArticleAuthorProfile(
+                    username=author.username,
+                    bio=author.bio,
+                    image=author.image,
+                    following=False,
                 ),
             )
         ),
