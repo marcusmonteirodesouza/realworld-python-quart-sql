@@ -10,15 +10,17 @@ def make_get_profile_url(username: str) -> str:
 
 @pytest.mark.asyncio
 async def test_when_user_is_followed_and_token_is_sent_should_return_200(
-    app, create_user, follow_user
+    app, create_user_and_decode, follow_user_and_decode
 ):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
-    await follow_user(follower_token=follower.token, username=followed.username)
+    await follow_user_and_decode(
+        follower_token=follower.token, username=followed.username
+    )
 
     response = await client.get(
         make_get_profile_url(username=followed.username),
@@ -39,13 +41,13 @@ async def test_when_user_is_followed_and_token_is_sent_should_return_200(
 
 @pytest.mark.asyncio
 async def test_when_user_is_not_followed_and_token_is_sent_should_return_200(
-    app, create_user
+    app, create_user_and_decode
 ):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
     response = await client.get(
         make_get_profile_url(username=followed.username),
@@ -66,11 +68,11 @@ async def test_when_user_is_not_followed_and_token_is_sent_should_return_200(
 
 @pytest.mark.asyncio
 async def test_when_user_is_not_found_and_token_is_sent_should_return_404(
-    app, create_user
+    app, create_user_and_decode
 ):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
     followed_username = str(uuid.uuid4())
 
@@ -93,7 +95,7 @@ async def test_when_user_is_not_found_and_token_is_sent_should_return_404(
 
 @pytest.mark.asyncio
 async def test_when_user_is_not_found_and_token_is_not_sent_should_return_404(
-    app, create_user
+    app, create_user_and_decode
 ):
     client = app.test_client()
 
@@ -114,13 +116,13 @@ async def test_when_user_is_not_found_and_token_is_not_sent_should_return_404(
 
 @pytest.mark.asyncio
 async def test_when_follower_is_not_found_and_token_is_sent_should_return_401(
-    app, faker, create_user
+    app, faker, create_user_and_decode
 ):
     client = app.test_client()
 
     token = create_jwt(username=str(uuid.uuid4()))
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
     response = await client.get(
         make_get_profile_url(username=followed.username),
@@ -136,15 +138,17 @@ async def test_when_follower_is_not_found_and_token_is_sent_should_return_401(
 
 @pytest.mark.asyncio
 async def test_when_authorization_header_has_invalid_scheme_should_return_200(
-    app, create_user, follow_user
+    app, create_user_and_decode, follow_user_and_decode
 ):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
-    await follow_user(follower_token=follower.token, username=followed.username)
+    await follow_user_and_decode(
+        follower_token=follower.token, username=followed.username
+    )
 
     response = await client.get(
         make_get_profile_url(username=followed.username),
@@ -164,12 +168,14 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_200(
 
 
 @pytest.mark.asyncio
-async def test_when_token_has_invalid_signature_should_return_401(app, create_user):
+async def test_when_token_has_invalid_signature_should_return_401(
+    app, create_user_and_decode
+):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
     secret_key = secrets.token_urlsafe()
 
@@ -188,12 +194,12 @@ async def test_when_token_has_invalid_signature_should_return_401(app, create_us
 
 
 @pytest.mark.asyncio
-async def test_when_token_is_expired_should_return_401(app, create_user):
+async def test_when_token_is_expired_should_return_401(app, create_user_and_decode):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
     token = create_jwt(username=follower.username, expires_seconds=-1)
 

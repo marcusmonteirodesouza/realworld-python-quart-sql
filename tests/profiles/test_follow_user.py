@@ -9,12 +9,12 @@ def make_follow_user_url(username: str) -> str:
 
 
 @pytest.mark.asyncio
-async def test_should_return_200(app, create_user):
+async def test_should_return_200(app, create_user_and_decode):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
     response = await client.post(
         make_follow_user_url(username=followed.username),
@@ -35,15 +35,15 @@ async def test_should_return_200(app, create_user):
 
 @pytest.mark.asyncio
 async def test_when_user_is_already_followed_should_return_200(
-    app, create_user, follow_user
+    app, create_user_and_decode, follow_user_and_decode
 ):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
-    follow_user_profile = await follow_user(
+    follow_user_profile = await follow_user_and_decode(
         follower_token=follower.token, username=followed.username
     )
 
@@ -66,19 +66,23 @@ async def test_when_user_is_already_followed_should_return_200(
 
 @pytest.mark.asyncio
 async def test_when_user_was_unfollowed_should_return_200(
-    app, create_user, follow_user, unfollow_user
+    app, create_user_and_decode, follow_user_and_decode, unfollow_user_and_decode
 ):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
-    await follow_user(follower_token=follower.token, username=followed.username)
+    await follow_user_and_decode(
+        follower_token=follower.token, username=followed.username
+    )
 
-    await unfollow_user(follower_token=follower.token, username=followed.username)
+    await unfollow_user_and_decode(
+        follower_token=follower.token, username=followed.username
+    )
 
-    follow_user_profile = await follow_user(
+    follow_user_profile = await follow_user_and_decode(
         follower_token=follower.token, username=followed.username
     )
 
@@ -100,10 +104,10 @@ async def test_when_user_was_unfollowed_should_return_200(
 
 
 @pytest.mark.asyncio
-async def test_when_user_is_not_found_should_return_404(app, create_user):
+async def test_when_user_is_not_found_should_return_404(app, create_user_and_decode):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
     followed_username = str(uuid.uuid4())
 
@@ -122,10 +126,12 @@ async def test_when_user_is_not_found_should_return_404(app, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_user_tries_to_follow_himself_should_return_422(app, create_user):
+async def test_when_user_tries_to_follow_himself_should_return_422(
+    app, create_user_and_decode
+):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
     response = await client.post(
         make_follow_user_url(username=follower.username),
@@ -140,10 +146,12 @@ async def test_when_user_tries_to_follow_himself_should_return_422(app, create_u
 
 
 @pytest.mark.asyncio
-async def test_when_authorization_header_is_not_set_should_return_401(app, create_user):
+async def test_when_authorization_header_is_not_set_should_return_401(
+    app, create_user_and_decode
+):
     client = app.test_client()
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
     response = await client.post(make_follow_user_url(username=followed.username))
 
@@ -156,13 +164,13 @@ async def test_when_authorization_header_is_not_set_should_return_401(app, creat
 
 @pytest.mark.asyncio
 async def test_when_authorization_header_has_invalid_scheme_should_return_401(
-    app, create_user
+    app, create_user_and_decode
 ):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
     response = await client.post(
         make_follow_user_url(username=followed.username),
@@ -177,12 +185,14 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_401(
 
 
 @pytest.mark.asyncio
-async def test_when_token_has_invalid_signature_should_return_401(app, create_user):
+async def test_when_token_has_invalid_signature_should_return_401(
+    app, create_user_and_decode
+):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
     secret_key = secrets.token_urlsafe()
 
@@ -201,12 +211,12 @@ async def test_when_token_has_invalid_signature_should_return_401(app, create_us
 
 
 @pytest.mark.asyncio
-async def test_when_token_is_expired_should_return_401(app, create_user):
+async def test_when_token_is_expired_should_return_401(app, create_user_and_decode):
     client = app.test_client()
 
-    follower = await create_user()
+    follower = await create_user_and_decode()
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
     token = create_jwt(username=follower.username, expires_seconds=-1)
 
@@ -223,12 +233,14 @@ async def test_when_token_is_expired_should_return_401(app, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_follower_is_not_found_should_return_401(app, faker, create_user):
+async def test_when_follower_is_not_found_should_return_401(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
     token = create_jwt(username=str(uuid.uuid4()))
 
-    followed = await create_user()
+    followed = await create_user_and_decode()
 
     response = await client.post(
         make_follow_user_url(username=followed.username),

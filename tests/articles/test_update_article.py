@@ -13,13 +13,17 @@ def make_update_article_url(slug: str) -> str:
 
 @pytest.mark.asyncio
 async def test_when_all_data_is_set_should_return_200(
-    app, faker, create_user, create_article, get_article
+    app,
+    faker,
+    create_user_and_decode,
+    create_article_and_decode,
+    get_article_and_decode,
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    article = await create_article(author_token=author.token)
+    article = await create_article_and_decode(author_token=author.token)
 
     data = {
         "article": {
@@ -67,7 +71,7 @@ async def test_when_all_data_is_set_should_return_200(
     updated_at = datetime.datetime.fromisoformat(updated_article["updatedAt"])
     assert updated_at > created_at
 
-    got_article = await get_article(slug=updated_article["slug"])
+    got_article = await get_article_and_decode(slug=updated_article["slug"])
 
     assert updated_article["title"] == got_article.title
     assert updated_article["description"] == got_article.description
@@ -79,13 +83,17 @@ async def test_when_all_data_is_set_should_return_200(
 
 @pytest.mark.asyncio
 async def test_when_title_is_set_should_return_200(
-    app, faker, create_user, create_article, get_article
+    app,
+    faker,
+    create_user_and_decode,
+    create_article_and_decode,
+    get_article_and_decode,
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    article = await create_article(author_token=author.token)
+    article = await create_article_and_decode(author_token=author.token)
 
     data = {
         "article": {
@@ -114,7 +122,7 @@ async def test_when_title_is_set_should_return_200(
     updated_at = datetime.datetime.fromisoformat(updated_article["updatedAt"])
     assert updated_at > created_at
 
-    got_article = await get_article(slug=updated_article["slug"])
+    got_article = await get_article_and_decode(slug=updated_article["slug"])
 
     assert updated_article["title"] == got_article.title
     assert updated_article["description"] == got_article.description
@@ -126,13 +134,17 @@ async def test_when_title_is_set_should_return_200(
 
 @pytest.mark.asyncio
 async def test_when_description_is_set_should_return_200(
-    app, faker, create_user, create_article, get_article
+    app,
+    faker,
+    create_user_and_decode,
+    create_article_and_decode,
+    get_article_and_decode,
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    article = await create_article(author_token=author.token)
+    article = await create_article_and_decode(author_token=author.token)
 
     data = {
         "article": {
@@ -161,7 +173,7 @@ async def test_when_description_is_set_should_return_200(
     updated_at = datetime.datetime.fromisoformat(updated_article["updatedAt"])
     assert updated_at > created_at
 
-    got_article = await get_article(slug=updated_article["slug"])
+    got_article = await get_article_and_decode(slug=updated_article["slug"])
 
     assert updated_article["title"] == got_article.title
     assert updated_article["description"] == got_article.description
@@ -173,13 +185,17 @@ async def test_when_description_is_set_should_return_200(
 
 @pytest.mark.asyncio
 async def test_when_body_is_set_should_return_200(
-    app, faker, create_user, create_article, get_article
+    app,
+    faker,
+    create_user_and_decode,
+    create_article_and_decode,
+    get_article_and_decode,
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    article = await create_article(author_token=author.token)
+    article = await create_article_and_decode(author_token=author.token)
 
     data = {
         "article": {
@@ -208,7 +224,7 @@ async def test_when_body_is_set_should_return_200(
     updated_at = datetime.datetime.fromisoformat(updated_article["updatedAt"])
     assert updated_at > created_at
 
-    got_article = await get_article(slug=updated_article["slug"])
+    got_article = await get_article_and_decode(slug=updated_article["slug"])
 
     assert updated_article["title"] == got_article.title
     assert updated_article["description"] == got_article.description
@@ -220,13 +236,17 @@ async def test_when_body_is_set_should_return_200(
 
 @pytest.mark.asyncio
 async def test_when_tagList_is_set_should_return_200(
-    app, faker, create_user, create_article, get_article
+    app,
+    faker,
+    create_user_and_decode,
+    create_article_and_decode,
+    get_article_and_decode,
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    article = await create_article(author_token=author.token)
+    article = await create_article_and_decode(author_token=author.token)
 
     data = {
         "article": {
@@ -266,9 +286,9 @@ async def test_when_tagList_is_set_should_return_200(
     ]
     created_at = datetime.datetime.fromisoformat(updated_article["createdAt"])
     updated_at = datetime.datetime.fromisoformat(updated_article["updatedAt"])
-    assert updated_at == created_at
+    assert updated_at > created_at
 
-    got_article = await get_article(slug=updated_article["slug"])
+    got_article = await get_article_and_decode(slug=updated_article["slug"])
 
     assert updated_article["title"] == got_article.title
     assert updated_article["description"] == got_article.description
@@ -280,13 +300,17 @@ async def test_when_tagList_is_set_should_return_200(
 
 @pytest.mark.asyncio
 async def test_when_no_data_is_set_should_return_200(
-    app, faker, create_user, create_article, get_article
+    app,
+    faker,
+    create_user_and_decode,
+    create_article_and_decode,
+    get_article_and_decode,
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    article = await create_article(author_token=author.token)
+    article = await create_article_and_decode(author_token=author.token)
 
     data = {"article": {}}
 
@@ -310,7 +334,7 @@ async def test_when_no_data_is_set_should_return_200(
     updated_at = datetime.datetime.fromisoformat(updated_article["updatedAt"])
     assert updated_at == created_at
 
-    got_article = await get_article(slug=updated_article["slug"])
+    got_article = await get_article_and_decode(slug=updated_article["slug"])
 
     assert updated_article["title"] == got_article.title
     assert updated_article["description"] == got_article.description
@@ -321,10 +345,12 @@ async def test_when_no_data_is_set_should_return_200(
 
 
 @pytest.mark.asyncio
-async def test_when_article_is_not_found_should_return_400(app, faker, create_user):
+async def test_when_article_is_not_found_should_return_404(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
     slug = str(uuid.uuid4())
 
@@ -354,14 +380,51 @@ async def test_when_article_is_not_found_should_return_400(app, faker, create_us
 
 
 @pytest.mark.asyncio
-async def test_when_authorization_header_has_invalid_scheme_should_return_401(
-    app, faker, create_user, create_article
+async def test_when_user_is_not_the_author_should_return_401(
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    user = await create_user_and_decode()
 
-    article = await create_article(author_token=author.token)
+    author = await create_user_and_decode()
+
+    article = await create_article_and_decode(author_token=author.token)
+
+    data = {
+        "article": {
+            "title": faker.sentence(),
+            "description": faker.sentence(),
+            "body": faker.paragraph(),
+            "tagList": faker.words(nb=10),
+        }
+    }
+
+    response = await client.put(
+        make_update_article_url(slug=article.slug),
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Token {user.token}",
+        },
+    )
+
+    assert response.status_code == 401
+
+    response_data = await response.json
+
+    assert response_data["errors"]["body"][0] == f"unauthorized"
+
+
+@pytest.mark.asyncio
+async def test_when_authorization_header_has_invalid_scheme_should_return_401(
+    app, faker, create_user_and_decode, create_article_and_decode
+):
+    client = app.test_client()
+
+    author = await create_user_and_decode()
+
+    article = await create_article_and_decode(author_token=author.token)
 
     data = {
         "article": {
@@ -390,13 +453,13 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_401(
 
 @pytest.mark.asyncio
 async def test_when_token_has_invalid_signature_should_return_401(
-    app, faker, create_user, create_article
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
     secret_key = secrets.token_urlsafe()
 
@@ -429,13 +492,13 @@ async def test_when_token_has_invalid_signature_should_return_401(
 
 @pytest.mark.asyncio
 async def test_when_token_is_expired_should_return_401(
-    app, faker, create_user, create_article
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
     token = create_jwt(username=author.username, expires_seconds=-1)
 
@@ -466,13 +529,13 @@ async def test_when_token_is_expired_should_return_401(
 
 @pytest.mark.asyncio
 async def test_when_user_is_not_found_should_return_401(
-    app, faker, create_user, create_article
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
     token = create_jwt(username=str(uuid.uuid4()))
 

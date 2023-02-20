@@ -32,8 +32,8 @@ def faker_seed():
 
 
 @pytest_asyncio.fixture(scope="function")
-async def create_user(app, faker):
-    async def _create_user() -> User:
+async def create_user_and_decode(app, faker):
+    async def _create_user_and_decode() -> User:
         client = app.test_client()
 
         register_user_data = {
@@ -87,12 +87,12 @@ async def create_user(app, faker):
             password=register_user_data["user"]["password"],
         )
 
-    yield _create_user
+    yield _create_user_and_decode
 
 
 @pytest_asyncio.fixture(scope="function")
-async def follow_user(app):
-    async def _follow_user(follower_token: str, username: str) -> Profile:
+async def follow_user_and_decode(app):
+    async def _follow_user_and_decode(follower_token: str, username: str) -> Profile:
         client = app.test_client()
 
         response = await client.post(
@@ -113,12 +113,12 @@ async def follow_user(app):
             following=profile_data["following"],
         )
 
-    yield _follow_user
+    yield _follow_user_and_decode
 
 
 @pytest_asyncio.fixture(scope="function")
-async def unfollow_user(app):
-    async def _unfollow_user(follower_token: str, username: str) -> Profile:
+async def unfollow_user_and_decode(app):
+    async def _unfollow_user_and_decode(follower_token: str, username: str) -> Profile:
         client = app.test_client()
 
         response = await client.delete(
@@ -139,12 +139,14 @@ async def unfollow_user(app):
             following=profile_data["following"],
         )
 
-    yield _unfollow_user
+    yield _unfollow_user_and_decode
 
 
 @pytest_asyncio.fixture(scope="function")
-async def get_profile(app):
-    async def _get_profile(username: str, follower_token: Optional[str]) -> Profile:
+async def get_profile_and_decode(app):
+    async def _get_profile_and_decode(
+        username: str, follower_token: Optional[str]
+    ) -> Profile:
         client = app.test_client()
 
         headers = {}
@@ -170,12 +172,12 @@ async def get_profile(app):
             following=profile_data["following"],
         )
 
-    yield _get_profile
+    yield _get_profile_and_decode
 
 
 @pytest_asyncio.fixture(scope="function")
-async def create_article(app, faker):
-    async def _create_article(author_token: str) -> Article:
+async def create_article_and_decode(app, faker):
+    async def _create_article_and_decode(author_token: str) -> Article:
         client = app.test_client()
 
         data = {
@@ -222,11 +224,11 @@ async def create_article(app, faker):
             ),
         )
 
-    yield _create_article
+    yield _create_article_and_decode
 
 
 @pytest_asyncio.fixture(scope="function")
-async def get_article(app, faker):
+async def get_article(app):
     async def _get_article(slug: str, user_token: Optional[str] = None) -> Article:
         client = app.test_client()
 
@@ -239,6 +241,18 @@ async def get_article(app, faker):
             f"/articles/{slug}",
             headers=headers,
         )
+
+        return response
+
+    yield _get_article
+
+
+@pytest_asyncio.fixture(scope="function")
+async def get_article_and_decode(get_article):
+    async def _get_article_and_decode(
+        slug: str, user_token: Optional[str] = None
+    ) -> Article:
+        response = await get_article(slug=slug, user_token=user_token)
 
         assert response.status_code == 200
 
@@ -266,12 +280,14 @@ async def get_article(app, faker):
             ),
         )
 
-    yield _get_article
+    yield _get_article_and_decode
 
 
 @pytest_asyncio.fixture(scope="function")
-async def favorite_article(app, faker):
-    async def _favorite_article(user_token: str, article_slug: str) -> Article:
+async def favorite_article_and_decode(app):
+    async def _favorite_article_and_decode(
+        user_token: str, article_slug: str
+    ) -> Article:
         client = app.test_client()
 
         response = await client.post(
@@ -307,4 +323,4 @@ async def favorite_article(app, faker):
             ),
         )
 
-    yield _favorite_article
+    yield _favorite_article_and_decode

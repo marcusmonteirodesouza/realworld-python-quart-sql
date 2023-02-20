@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from quart import Blueprint, current_app
+from quart import Blueprint, current_app, Response
 from quart_schema import validate_request, validate_response
 
 from .article_response import (
@@ -134,11 +134,18 @@ async def update_article(
         raise UnauthorizedException(f"author {author_username} not found")
 
     current_app.logger.info(
-        f"received update article request. author_id: {author.id}, data: {data}"
+        f"received update article request. author_id: {author.id}, slug: {slug}, data: {data}"
     )
 
-    article = await current_app.articles_service.update_article_by_slug(
-        slug=slug,
+    article = await current_app.articles_service.get_article_by_slug(slug=slug)
+
+    if article.author_id != author.id:
+        raise UnauthorizedException(
+            f"user {author.id} not authorized to modify article {article.id}"
+        )
+
+    article = await current_app.articles_service.update_article_by_id(
+        article_id=article.id,
         params=UpdateArticleParams(
             title=data.article.title,
             description=data.article.description,
@@ -168,6 +175,34 @@ async def update_article(
             )
         ),
     )
+
+
+@articles_blueprint.delete(rule="/articles/<slug>")
+@jwt_required
+async def delete_article(slug: str):
+    author_username = get_jwt_identity()
+
+    author = await current_app.users_service.get_user_by_username(
+        username=author_username
+    )
+
+    if not author:
+        raise UnauthorizedException(f"author {author_username} not found")
+
+    current_app.logger.info(
+        f"received delete article request. author_id: {author.id}, slug: {slug}"
+    )
+
+    article = await current_app.articles_service.get_article_by_slug(slug=slug)
+
+    if article.author_id != author.id:
+        raise UnauthorizedException(
+            f"user {author.id} not authorized to deleted article {article.id}"
+        )
+
+    await current_app.articles_service.delete_article_by_id(article_id=article.id)
+
+    return Response(status=HTTPStatus.NO_CONTENT)
 
 
 @articles_blueprint.post(rule="/articles/<slug>/favorite")
