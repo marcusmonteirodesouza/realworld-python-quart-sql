@@ -6,10 +6,10 @@ import jwt
 
 
 @pytest.mark.asyncio
-async def test_should_return_200(app, faker, create_user):
+async def test_should_return_200(app, faker, create_user_and_decode):
     client = app.test_client()
 
-    user = await create_user()
+    user = await create_user_and_decode()
 
     data = {
         "user": {
@@ -50,10 +50,12 @@ async def test_should_return_200(app, faker, create_user):
 
 
 @pytest.mark.asyncio
-async def test_when_email_is_not_sent_should_return_400(app, faker, create_user):
+async def test_when_email_is_not_sent_should_return_400(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
-    user = await create_user()
+    user = await create_user_and_decode()
 
     data = {
         "user": {
@@ -78,10 +80,12 @@ async def test_when_email_is_not_sent_should_return_400(app, faker, create_user)
 
 
 @pytest.mark.asyncio
-async def test_when_email_is_not_found_should_return_401(app, faker, create_user):
+async def test_when_email_is_not_found_should_return_401(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
-    user = await create_user()
+    user = await create_user_and_decode()
 
     data = {
         "user": {
@@ -104,10 +108,12 @@ async def test_when_email_is_not_found_should_return_401(app, faker, create_user
 
 
 @pytest.mark.asyncio
-async def test_when_password_is_not_sent_should_return_400(app, faker, create_user):
+async def test_when_password_is_not_sent_should_return_400(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
-    user = await create_user()
+    user = await create_user_and_decode()
 
     data = {
         "user": {
@@ -132,10 +138,12 @@ async def test_when_password_is_not_sent_should_return_400(app, faker, create_us
 
 
 @pytest.mark.asyncio
-async def test_when_password_is_incorrect_should_return_401(app, faker, create_user):
+async def test_when_password_is_incorrect_should_return_401(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
-    user = await create_user()
+    user = await create_user_and_decode()
 
     data = {
         "user": {

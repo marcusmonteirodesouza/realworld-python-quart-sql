@@ -11,23 +11,32 @@ def make_get_article_url(slug: str) -> str:
 
 @pytest.mark.asyncio
 async def test_when_token_is_sent_and_article_is_favorited_and_author_is_followed_should_return_200(
-    app, faker, create_user, follow_user, create_article, favorite_article
+    app,
+    faker,
+    create_user_and_decode,
+    follow_user_and_decode,
+    create_article_and_decode,
+    favorite_article_and_decode,
 ):
     client = app.test_client()
 
-    user1 = await create_user()
+    user1 = await create_user_and_decode()
 
-    user2 = await create_user()
+    user2 = await create_user_and_decode()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
-    await follow_user(follower_token=user1.token, username=author.username)
+    await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
-    await favorite_article(user_token=user1.token, article_slug=created_article.slug)
+    await favorite_article_and_decode(
+        user_token=user1.token, article_slug=created_article.slug
+    )
 
-    await favorite_article(user_token=user2.token, article_slug=created_article.slug)
+    await favorite_article_and_decode(
+        user_token=user2.token, article_slug=created_article.slug
+    )
 
     response = await client.get(
         make_get_article_url(slug=created_article.slug),
@@ -63,21 +72,28 @@ async def test_when_token_is_sent_and_article_is_favorited_and_author_is_followe
 
 @pytest.mark.asyncio
 async def test_when_token_is_sent_and_article_is_not_favorited_and_author_is_followed_should_return_200(
-    app, faker, create_user, follow_user, create_article, favorite_article
+    app,
+    faker,
+    create_user_and_decode,
+    follow_user_and_decode,
+    create_article_and_decode,
+    favorite_article_and_decode,
 ):
     client = app.test_client()
 
-    user1 = await create_user()
+    user1 = await create_user_and_decode()
 
-    user2 = await create_user()
+    user2 = await create_user_and_decode()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
-    await follow_user(follower_token=user1.token, username=author.username)
+    await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
-    await favorite_article(user_token=user2.token, article_slug=created_article.slug)
+    await favorite_article_and_decode(
+        user_token=user2.token, article_slug=created_article.slug
+    )
 
     response = await client.get(
         make_get_article_url(slug=created_article.slug),
@@ -113,21 +129,29 @@ async def test_when_token_is_sent_and_article_is_not_favorited_and_author_is_fol
 
 @pytest.mark.asyncio
 async def test_when_token_is_sent_and_article_is_favorited_and_author_is_not_followed_should_return_200(
-    app, faker, create_user, create_article, favorite_article
+    app,
+    faker,
+    create_user_and_decode,
+    create_article_and_decode,
+    favorite_article_and_decode,
 ):
     client = app.test_client()
 
-    user1 = await create_user()
+    user1 = await create_user_and_decode()
 
-    user2 = await create_user()
+    user2 = await create_user_and_decode()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
-    await favorite_article(user_token=user1.token, article_slug=created_article.slug)
+    await favorite_article_and_decode(
+        user_token=user1.token, article_slug=created_article.slug
+    )
 
-    await favorite_article(user_token=user2.token, article_slug=created_article.slug)
+    await favorite_article_and_decode(
+        user_token=user2.token, article_slug=created_article.slug
+    )
 
     response = await client.get(
         make_get_article_url(slug=created_article.slug),
@@ -163,19 +187,26 @@ async def test_when_token_is_sent_and_article_is_favorited_and_author_is_not_fol
 
 @pytest.mark.asyncio
 async def test_when_token_is_sent_and_article_is_not_favorited_and_author_is_not_followed_should_return_200(
-    app, faker, create_user, follow_user, create_article, favorite_article
+    app,
+    faker,
+    create_user_and_decode,
+    follow_user_and_decode,
+    create_article_and_decode,
+    favorite_article_and_decode,
 ):
     client = app.test_client()
 
-    user1 = await create_user()
+    user1 = await create_user_and_decode()
 
-    user2 = await create_user()
+    user2 = await create_user_and_decode()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
-    await favorite_article(user_token=user2.token, article_slug=created_article.slug)
+    await favorite_article_and_decode(
+        user_token=user2.token, article_slug=created_article.slug
+    )
 
     response = await client.get(
         make_get_article_url(slug=created_article.slug),
@@ -211,19 +242,26 @@ async def test_when_token_is_sent_and_article_is_not_favorited_and_author_is_not
 
 @pytest.mark.asyncio
 async def test_when_token_is_not_sent_should_return_200(
-    app, faker, create_user, follow_user, create_article, favorite_article
+    app,
+    faker,
+    create_user_and_decode,
+    follow_user_and_decode,
+    create_article_and_decode,
+    favorite_article_and_decode,
 ):
     client = app.test_client()
 
-    user = await create_user()
+    user = await create_user_and_decode()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
-    await follow_user(follower_token=user.token, username=author.username)
+    await follow_user_and_decode(follower_token=user.token, username=author.username)
 
-    await favorite_article(user_token=user.token, article_slug=created_article.slug)
+    await favorite_article_and_decode(
+        user_token=user.token, article_slug=created_article.slug
+    )
 
     response = await client.get(
         make_get_article_url(slug=created_article.slug),
@@ -275,15 +313,15 @@ async def test_when_article_is_not_found_should_return_404(app, faker):
 
 @pytest.mark.asyncio
 async def test_when_authorization_header_has_invalid_scheme_should_return_200(
-    app, faker, create_user, create_article
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    user = await create_user()
+    user = await create_user_and_decode()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
     response = await client.get(
         make_get_article_url(slug=created_article.slug),
@@ -319,13 +357,13 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_200(
 
 @pytest.mark.asyncio
 async def test_when_token_has_invalid_signature_should_return_401(
-    app, faker, create_user, create_article
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
     secret_key = secrets.token_urlsafe()
 
@@ -347,13 +385,13 @@ async def test_when_token_has_invalid_signature_should_return_401(
 
 @pytest.mark.asyncio
 async def test_when_token_is_expired_should_return_401(
-    app, faker, create_user, create_article
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
     token = create_jwt(username=author.username, expires_seconds=-1)
 
@@ -373,13 +411,13 @@ async def test_when_token_is_expired_should_return_401(
 
 @pytest.mark.asyncio
 async def test_when_user_is_not_found_should_return_401(
-    app, faker, create_user, create_article
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
     token = create_jwt(username=str(uuid.uuid4()))
 

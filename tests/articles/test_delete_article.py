@@ -9,12 +9,14 @@ def make_delete_article_url(slug: str) -> str:
 
 
 @pytest.mark.asyncio
-async def test_should_return_204(app, faker, create_user, create_article, get_article):
+async def test_should_return_204(
+    app, faker, create_user_and_decode, create_article_and_decode, get_article
+):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    article = await create_article(author_token=author.token)
+    article = await create_article_and_decode(author_token=author.token)
 
     response = await client.delete(
         make_delete_article_url(slug=article.slug),
@@ -42,10 +44,12 @@ async def test_should_return_204(app, faker, create_user, create_article, get_ar
 
 
 @pytest.mark.asyncio
-async def test_when_article_is_not_found_should_return_404(app, faker, create_user):
+async def test_when_article_is_not_found_should_return_404(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
     slug = str(uuid.uuid4())
 
@@ -65,15 +69,15 @@ async def test_when_article_is_not_found_should_return_404(app, faker, create_us
 
 @pytest.mark.asyncio
 async def test_when_user_is_not_the_author_should_return_401(
-    app, faker, create_user, create_article
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    user = await create_user()
+    user = await create_user_and_decode()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    article = await create_article(author_token=author.token)
+    article = await create_article_and_decode(author_token=author.token)
 
     response = await client.delete(
         make_delete_article_url(slug=article.slug),
@@ -91,13 +95,13 @@ async def test_when_user_is_not_the_author_should_return_401(
 
 @pytest.mark.asyncio
 async def test_when_authorization_header_has_invalid_scheme_should_return_401(
-    app, faker, create_user, create_article
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    article = await create_article(author_token=author.token)
+    article = await create_article_and_decode(author_token=author.token)
 
     response = await client.delete(
         make_delete_article_url(slug=article.slug),
@@ -115,13 +119,13 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_401(
 
 @pytest.mark.asyncio
 async def test_when_token_has_invalid_signature_should_return_401(
-    app, faker, create_user, create_article
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
     secret_key = secrets.token_urlsafe()
 
@@ -143,13 +147,13 @@ async def test_when_token_has_invalid_signature_should_return_401(
 
 @pytest.mark.asyncio
 async def test_when_token_is_expired_should_return_401(
-    app, faker, create_user, create_article
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
     token = create_jwt(username=author.username, expires_seconds=-1)
 
@@ -169,13 +173,13 @@ async def test_when_token_is_expired_should_return_401(
 
 @pytest.mark.asyncio
 async def test_when_user_is_not_found_should_return_401(
-    app, faker, create_user, create_article
+    app, faker, create_user_and_decode, create_article_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
-    created_article = await create_article(author_token=author.token)
+    created_article = await create_article_and_decode(author_token=author.token)
 
     token = create_jwt(username=str(uuid.uuid4()))
 

@@ -9,10 +9,10 @@ from ..utils import create_jwt
 
 
 @pytest.mark.asyncio
-async def test_should_return_201(app, faker, create_user):
+async def test_should_return_201(app, faker, create_user_and_decode):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
     data = {
         "article": {
@@ -74,15 +74,19 @@ async def test_should_return_201(app, faker, create_user):
 
 @pytest.mark.asyncio
 async def test_when_creating_article_with_same_title_as_an_existing_one_should_return_201(
-    app, faker, create_user, create_article, get_article_and_decode
+    app,
+    faker,
+    create_user_and_decode,
+    create_article_and_decode,
+    get_article_and_decode,
 ):
     client = app.test_client()
 
-    author1 = await create_user()
+    author1 = await create_user_and_decode()
 
-    author2 = await create_user()
+    author2 = await create_user_and_decode()
 
-    existing_article = await create_article(author_token=author2.token)
+    existing_article = await create_article_and_decode(author_token=author2.token)
 
     data = {
         "article": {
@@ -117,10 +121,12 @@ async def test_when_creating_article_with_same_title_as_an_existing_one_should_r
 
 
 @pytest.mark.asyncio
-async def test_when_tagList_is_not_sent_should_return_201(app, faker, create_user):
+async def test_when_tagList_is_not_sent_should_return_201(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
     data = {
         "article": {
@@ -167,10 +173,12 @@ async def test_when_tagList_is_not_sent_should_return_201(app, faker, create_use
 
 
 @pytest.mark.asyncio
-async def test_when_article_is_not_sent_should_return_400(app, faker, create_user):
+async def test_when_article_is_not_sent_should_return_400(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
     data = {}
 
@@ -194,10 +202,12 @@ async def test_when_article_is_not_sent_should_return_400(app, faker, create_use
 
 
 @pytest.mark.asyncio
-async def test_when_title_is_not_sent_should_return_400(app, faker, create_user):
+async def test_when_title_is_not_sent_should_return_400(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
     data = {
         "article": {
@@ -227,10 +237,12 @@ async def test_when_title_is_not_sent_should_return_400(app, faker, create_user)
 
 
 @pytest.mark.asyncio
-async def test_when_description_is_not_sent_should_return_400(app, faker, create_user):
+async def test_when_description_is_not_sent_should_return_400(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
     data = {
         "article": {
@@ -260,10 +272,12 @@ async def test_when_description_is_not_sent_should_return_400(app, faker, create
 
 
 @pytest.mark.asyncio
-async def test_when_body_is_not_sent_should_return_400(app, faker, create_user):
+async def test_when_body_is_not_sent_should_return_400(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
     data = {
         "article": {
@@ -294,11 +308,11 @@ async def test_when_body_is_not_sent_should_return_400(app, faker, create_user):
 
 @pytest.mark.asyncio
 async def test_when_authorization_header_has_invalid_scheme_should_return_401(
-    app, faker, create_user
+    app, faker, create_user_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
     data = {
         "article": {
@@ -327,11 +341,11 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_401(
 
 @pytest.mark.asyncio
 async def test_when_token_has_invalid_signature_should_return_401(
-    app, faker, create_user
+    app, faker, create_user_and_decode
 ):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
     data = {
         "article": {
@@ -363,10 +377,12 @@ async def test_when_token_has_invalid_signature_should_return_401(
 
 
 @pytest.mark.asyncio
-async def test_when_token_is_expired_should_return_401(app, faker, create_user):
+async def test_when_token_is_expired_should_return_401(
+    app, faker, create_user_and_decode
+):
     client = app.test_client()
 
-    author = await create_user()
+    author = await create_user_and_decode()
 
     data = {
         "article": {
