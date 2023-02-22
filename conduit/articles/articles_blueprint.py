@@ -136,26 +136,24 @@ async def list_articles(
                 user_id=article.author_id
             )
 
-        article_response = ArticleResponse(
-            article=ArticleResponseArticle(
-                slug=article.slug,
-                title=article.title,
-                description=article.description,
-                body=article.body,
-                tag_list=article.tags,
-                created_at=article.created_at,
-                updated_at=article.updated_at,
-                favorited=is_favorited_by_current_user,
-                favorites_count=article.favorites_count,
-                author=ArticleResponseArticleAuthorProfile(
-                    username=author_profile.username,
-                    bio=author_profile.bio,
-                    image=author_profile.image,
-                    following=author_profile.following,
-                ),
-            )
+        article_response_article = ArticleResponseArticle(
+            slug=article.slug,
+            title=article.title,
+            description=article.description,
+            body=article.body,
+            tag_list=article.tags,
+            created_at=article.created_at,
+            updated_at=article.updated_at,
+            favorited=is_favorited_by_current_user,
+            favorites_count=article.favorites_count,
+            author=ArticleResponseArticleAuthorProfile(
+                username=author_profile.username,
+                bio=author_profile.bio,
+                image=author_profile.image,
+                following=author_profile.following,
+            ),
         )
-        article_responses.append(article_response)
+        article_responses.append(article_response_article)
 
     return MultipleArticlesResponse(
         articles=article_responses, articles_count=len(article_responses)

@@ -110,54 +110,54 @@ async def test_when_token_is_sent_and_articles_are_favorited_and_authors_are_fol
     assert len(articles) == limit
     assert articles_count == limit
 
-    assert articles[0]["article"]["slug"] == article4.slug
-    assert articles[0]["article"]["title"] == article4.title
-    assert articles[0]["article"]["description"] == article4.description
-    assert articles[0]["article"]["body"] == article4.body
-    assert articles[0]["article"]["tagList"] == article4.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[0]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[0]["article"]["updatedAt"])
+    assert articles[0]["slug"] == article4.slug
+    assert articles[0]["title"] == article4.title
+    assert articles[0]["description"] == article4.description
+    assert articles[0]["body"] == article4.body
+    assert articles[0]["tagList"] == article4.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[0]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[0]["updatedAt"])
     assert created_at == article4.created_at
     assert updated_at == article4.updated_at
-    assert not articles[0]["article"]["favorited"]
-    assert articles[0]["article"]["favoritesCount"] == 1
-    assert articles[0]["article"]["author"] == {
+    assert not articles[0]["favorited"]
+    assert articles[0]["favoritesCount"] == 1
+    assert articles[0]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": True,
     }
 
-    assert articles[1]["article"]["slug"] == article3.slug
-    assert articles[1]["article"]["title"] == article3.title
-    assert articles[1]["article"]["description"] == article3.description
-    assert articles[1]["article"]["body"] == article3.body
-    assert articles[1]["article"]["tagList"] == article3.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[1]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[1]["article"]["updatedAt"])
+    assert articles[1]["slug"] == article3.slug
+    assert articles[1]["title"] == article3.title
+    assert articles[1]["description"] == article3.description
+    assert articles[1]["body"] == article3.body
+    assert articles[1]["tagList"] == article3.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[1]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[1]["updatedAt"])
     assert created_at == article3.created_at
     assert updated_at == article3.updated_at
-    assert articles[1]["article"]["favorited"]
-    assert articles[1]["article"]["favoritesCount"] == 2
-    assert articles[1]["article"]["author"] == {
+    assert articles[1]["favorited"]
+    assert articles[1]["favoritesCount"] == 2
+    assert articles[1]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": True,
     }
 
-    assert articles[2]["article"]["slug"] == article2.slug
-    assert articles[2]["article"]["title"] == article2.title
-    assert articles[2]["article"]["description"] == article2.description
-    assert articles[2]["article"]["body"] == article2.body
-    assert articles[2]["article"]["tagList"] == article2.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[2]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[2]["article"]["updatedAt"])
+    assert articles[2]["slug"] == article2.slug
+    assert articles[2]["title"] == article2.title
+    assert articles[2]["description"] == article2.description
+    assert articles[2]["body"] == article2.body
+    assert articles[2]["tagList"] == article2.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[2]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[2]["updatedAt"])
     assert created_at == article2.created_at
     assert updated_at == article2.updated_at
-    assert not articles[2]["article"]["favorited"]
-    assert articles[2]["article"]["favoritesCount"] == 1
-    assert articles[2]["article"]["author"] == {
+    assert not articles[2]["favorited"]
+    assert articles[2]["favoritesCount"] == 1
+    assert articles[2]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
@@ -236,54 +236,54 @@ async def test_when_token_is_sent_and_articles_are_favorited_and_authors_are_fol
     assert len(articles) == limit
     assert articles_count == limit
 
-    assert articles[0]["article"]["slug"] == article4.slug
-    assert articles[0]["article"]["title"] == article4.title
-    assert articles[0]["article"]["description"] == article4.description
-    assert articles[0]["article"]["body"] == article4.body
-    assert articles[0]["article"]["tagList"] == article4.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[0]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[0]["article"]["updatedAt"])
+    assert articles[0]["slug"] == article4.slug
+    assert articles[0]["title"] == article4.title
+    assert articles[0]["description"] == article4.description
+    assert articles[0]["body"] == article4.body
+    assert articles[0]["tagList"] == article4.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[0]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[0]["updatedAt"])
     assert created_at == article4.created_at
     assert updated_at == article4.updated_at
-    assert not articles[0]["article"]["favorited"]
-    assert articles[0]["article"]["favoritesCount"] == 1
-    assert articles[0]["article"]["author"] == {
+    assert not articles[0]["favorited"]
+    assert articles[0]["favoritesCount"] == 1
+    assert articles[0]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": True,
     }
 
-    assert articles[1]["article"]["slug"] == article3.slug
-    assert articles[1]["article"]["title"] == article3.title
-    assert articles[1]["article"]["description"] == article3.description
-    assert articles[1]["article"]["body"] == article3.body
-    assert articles[1]["article"]["tagList"] == article3.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[1]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[1]["article"]["updatedAt"])
+    assert articles[1]["slug"] == article3.slug
+    assert articles[1]["title"] == article3.title
+    assert articles[1]["description"] == article3.description
+    assert articles[1]["body"] == article3.body
+    assert articles[1]["tagList"] == article3.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[1]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[1]["updatedAt"])
     assert created_at == article3.created_at
     assert updated_at == article3.updated_at
-    assert articles[1]["article"]["favorited"]
-    assert articles[1]["article"]["favoritesCount"] == 2
-    assert articles[1]["article"]["author"] == {
+    assert articles[1]["favorited"]
+    assert articles[1]["favoritesCount"] == 2
+    assert articles[1]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": True,
     }
 
-    assert articles[2]["article"]["slug"] == article2.slug
-    assert articles[2]["article"]["title"] == article2.title
-    assert articles[2]["article"]["description"] == article2.description
-    assert articles[2]["article"]["body"] == article2.body
-    assert articles[2]["article"]["tagList"] == article2.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[2]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[2]["article"]["updatedAt"])
+    assert articles[2]["slug"] == article2.slug
+    assert articles[2]["title"] == article2.title
+    assert articles[2]["description"] == article2.description
+    assert articles[2]["body"] == article2.body
+    assert articles[2]["tagList"] == article2.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[2]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[2]["updatedAt"])
     assert created_at == article2.created_at
     assert updated_at == article2.updated_at
-    assert not articles[2]["article"]["favorited"]
-    assert articles[2]["article"]["favoritesCount"] == 1
-    assert articles[2]["article"]["author"] == {
+    assert not articles[2]["favorited"]
+    assert articles[2]["favoritesCount"] == 1
+    assert articles[2]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
@@ -365,54 +365,54 @@ async def test_when_token_is_sent_and_articles_are_favorited_and_authors_are_fol
     assert len(articles) == limit
     assert articles_count == limit
 
-    assert articles[0]["article"]["slug"] == article4.slug
-    assert articles[0]["article"]["title"] == article4.title
-    assert articles[0]["article"]["description"] == article4.description
-    assert articles[0]["article"]["body"] == article4.body
-    assert articles[0]["article"]["tagList"] == article4.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[0]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[0]["article"]["updatedAt"])
+    assert articles[0]["slug"] == article4.slug
+    assert articles[0]["title"] == article4.title
+    assert articles[0]["description"] == article4.description
+    assert articles[0]["body"] == article4.body
+    assert articles[0]["tagList"] == article4.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[0]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[0]["updatedAt"])
     assert created_at == article4.created_at
     assert updated_at == article4.updated_at
-    assert not articles[0]["article"]["favorited"]
-    assert articles[0]["article"]["favoritesCount"] == 1
-    assert articles[0]["article"]["author"] == {
+    assert not articles[0]["favorited"]
+    assert articles[0]["favoritesCount"] == 1
+    assert articles[0]["author"] == {
         "username": author2.username,
         "bio": author2.bio,
         "image": author2.image,
         "following": False,
     }
 
-    assert articles[1]["article"]["slug"] == article3.slug
-    assert articles[1]["article"]["title"] == article3.title
-    assert articles[1]["article"]["description"] == article3.description
-    assert articles[1]["article"]["body"] == article3.body
-    assert articles[1]["article"]["tagList"] == article3.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[1]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[1]["article"]["updatedAt"])
+    assert articles[1]["slug"] == article3.slug
+    assert articles[1]["title"] == article3.title
+    assert articles[1]["description"] == article3.description
+    assert articles[1]["body"] == article3.body
+    assert articles[1]["tagList"] == article3.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[1]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[1]["updatedAt"])
     assert created_at == article3.created_at
     assert updated_at == article3.updated_at
-    assert articles[1]["article"]["favorited"]
-    assert articles[1]["article"]["favoritesCount"] == 2
-    assert articles[1]["article"]["author"] == {
+    assert articles[1]["favorited"]
+    assert articles[1]["favoritesCount"] == 2
+    assert articles[1]["author"] == {
         "username": author1.username,
         "bio": author1.bio,
         "image": author1.image,
         "following": True,
     }
 
-    assert articles[2]["article"]["slug"] == article2.slug
-    assert articles[2]["article"]["title"] == article2.title
-    assert articles[2]["article"]["description"] == article2.description
-    assert articles[2]["article"]["body"] == article2.body
-    assert articles[2]["article"]["tagList"] == article2.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[2]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[2]["article"]["updatedAt"])
+    assert articles[2]["slug"] == article2.slug
+    assert articles[2]["title"] == article2.title
+    assert articles[2]["description"] == article2.description
+    assert articles[2]["body"] == article2.body
+    assert articles[2]["tagList"] == article2.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[2]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[2]["updatedAt"])
     assert created_at == article2.created_at
     assert updated_at == article2.updated_at
-    assert not articles[2]["article"]["favorited"]
-    assert articles[2]["article"]["favoritesCount"] == 1
-    assert articles[2]["article"]["author"] == {
+    assert not articles[2]["favorited"]
+    assert articles[2]["favoritesCount"] == 1
+    assert articles[2]["author"] == {
         "username": author2.username,
         "bio": author2.bio,
         "image": author2.image,
@@ -477,54 +477,54 @@ async def test_when_token_is_sent_and_articles_are_favorited_and_authors_are_fol
     assert len(articles) == limit
     assert articles_count == limit
 
-    assert articles[0]["article"]["slug"] == article4.slug
-    assert articles[0]["article"]["title"] == article4.title
-    assert articles[0]["article"]["description"] == article4.description
-    assert articles[0]["article"]["body"] == article4.body
-    assert articles[0]["article"]["tagList"] == article4.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[0]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[0]["article"]["updatedAt"])
+    assert articles[0]["slug"] == article4.slug
+    assert articles[0]["title"] == article4.title
+    assert articles[0]["description"] == article4.description
+    assert articles[0]["body"] == article4.body
+    assert articles[0]["tagList"] == article4.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[0]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[0]["updatedAt"])
     assert created_at == article4.created_at
     assert updated_at == article4.updated_at
-    assert not articles[0]["article"]["favorited"]
-    assert articles[0]["article"]["favoritesCount"] == 0
-    assert articles[0]["article"]["author"] == {
+    assert not articles[0]["favorited"]
+    assert articles[0]["favoritesCount"] == 0
+    assert articles[0]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": True,
     }
 
-    assert articles[1]["article"]["slug"] == article3.slug
-    assert articles[1]["article"]["title"] == article3.title
-    assert articles[1]["article"]["description"] == article3.description
-    assert articles[1]["article"]["body"] == article3.body
-    assert articles[1]["article"]["tagList"] == article3.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[1]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[1]["article"]["updatedAt"])
+    assert articles[1]["slug"] == article3.slug
+    assert articles[1]["title"] == article3.title
+    assert articles[1]["description"] == article3.description
+    assert articles[1]["body"] == article3.body
+    assert articles[1]["tagList"] == article3.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[1]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[1]["updatedAt"])
     assert created_at == article3.created_at
     assert updated_at == article3.updated_at
-    assert articles[1]["article"]["favorited"]
-    assert articles[1]["article"]["favoritesCount"] == 1
-    assert articles[1]["article"]["author"] == {
+    assert articles[1]["favorited"]
+    assert articles[1]["favoritesCount"] == 1
+    assert articles[1]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": True,
     }
 
-    assert articles[2]["article"]["slug"] == article2.slug
-    assert articles[2]["article"]["title"] == article2.title
-    assert articles[2]["article"]["description"] == article2.description
-    assert articles[2]["article"]["body"] == article2.body
-    assert articles[2]["article"]["tagList"] == article2.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[2]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[2]["article"]["updatedAt"])
+    assert articles[2]["slug"] == article2.slug
+    assert articles[2]["title"] == article2.title
+    assert articles[2]["description"] == article2.description
+    assert articles[2]["body"] == article2.body
+    assert articles[2]["tagList"] == article2.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[2]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[2]["updatedAt"])
     assert created_at == article2.created_at
     assert updated_at == article2.updated_at
-    assert not articles[2]["article"]["favorited"]
-    assert articles[2]["article"]["favoritesCount"] == 0
-    assert articles[2]["article"]["author"] == {
+    assert not articles[2]["favorited"]
+    assert articles[2]["favoritesCount"] == 0
+    assert articles[2]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
@@ -604,72 +604,72 @@ async def test_when_token_is_sent_and_articles_are_favorited_and_authors_are_fol
     assert len(articles) == 4
     assert articles_count == 4
 
-    assert articles[0]["article"]["slug"] == article4.slug
-    assert articles[0]["article"]["title"] == article4.title
-    assert articles[0]["article"]["description"] == article4.description
-    assert articles[0]["article"]["body"] == article4.body
-    assert articles[0]["article"]["tagList"] == article4.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[0]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[0]["article"]["updatedAt"])
+    assert articles[0]["slug"] == article4.slug
+    assert articles[0]["title"] == article4.title
+    assert articles[0]["description"] == article4.description
+    assert articles[0]["body"] == article4.body
+    assert articles[0]["tagList"] == article4.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[0]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[0]["updatedAt"])
     assert created_at == article4.created_at
     assert updated_at == article4.updated_at
-    assert not articles[0]["article"]["favorited"]
-    assert articles[0]["article"]["favoritesCount"] == 1
-    assert articles[0]["article"]["author"] == {
+    assert not articles[0]["favorited"]
+    assert articles[0]["favoritesCount"] == 1
+    assert articles[0]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": True,
     }
 
-    assert articles[1]["article"]["slug"] == article3.slug
-    assert articles[1]["article"]["title"] == article3.title
-    assert articles[1]["article"]["description"] == article3.description
-    assert articles[1]["article"]["body"] == article3.body
-    assert articles[1]["article"]["tagList"] == article3.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[1]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[1]["article"]["updatedAt"])
+    assert articles[1]["slug"] == article3.slug
+    assert articles[1]["title"] == article3.title
+    assert articles[1]["description"] == article3.description
+    assert articles[1]["body"] == article3.body
+    assert articles[1]["tagList"] == article3.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[1]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[1]["updatedAt"])
     assert created_at == article3.created_at
     assert updated_at == article3.updated_at
-    assert articles[1]["article"]["favorited"]
-    assert articles[1]["article"]["favoritesCount"] == 2
-    assert articles[1]["article"]["author"] == {
+    assert articles[1]["favorited"]
+    assert articles[1]["favoritesCount"] == 2
+    assert articles[1]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": True,
     }
 
-    assert articles[2]["article"]["slug"] == article2.slug
-    assert articles[2]["article"]["title"] == article2.title
-    assert articles[2]["article"]["description"] == article2.description
-    assert articles[2]["article"]["body"] == article2.body
-    assert articles[2]["article"]["tagList"] == article2.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[2]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[2]["article"]["updatedAt"])
+    assert articles[2]["slug"] == article2.slug
+    assert articles[2]["title"] == article2.title
+    assert articles[2]["description"] == article2.description
+    assert articles[2]["body"] == article2.body
+    assert articles[2]["tagList"] == article2.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[2]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[2]["updatedAt"])
     assert created_at == article2.created_at
     assert updated_at == article2.updated_at
-    assert not articles[2]["article"]["favorited"]
-    assert articles[2]["article"]["favoritesCount"] == 1
-    assert articles[2]["article"]["author"] == {
+    assert not articles[2]["favorited"]
+    assert articles[2]["favoritesCount"] == 1
+    assert articles[2]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": True,
     }
 
-    assert articles[3]["article"]["slug"] == article1.slug
-    assert articles[3]["article"]["title"] == article1.title
-    assert articles[3]["article"]["description"] == article1.description
-    assert articles[3]["article"]["body"] == article1.body
-    assert articles[3]["article"]["tagList"] == article1.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[3]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[3]["article"]["updatedAt"])
+    assert articles[3]["slug"] == article1.slug
+    assert articles[3]["title"] == article1.title
+    assert articles[3]["description"] == article1.description
+    assert articles[3]["body"] == article1.body
+    assert articles[3]["tagList"] == article1.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[3]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[3]["updatedAt"])
     assert created_at == article1.created_at
     assert updated_at == article1.updated_at
-    assert not articles[3]["article"]["favorited"]
-    assert articles[3]["article"]["favoritesCount"] == 1
-    assert articles[3]["article"]["author"] == {
+    assert not articles[3]["favorited"]
+    assert articles[3]["favoritesCount"] == 1
+    assert articles[3]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
@@ -749,54 +749,54 @@ async def test_when_token_is_sent_and_articles_are_favorited_and_authors_are_fol
     assert len(articles) == limit
     assert articles_count == limit
 
-    assert articles[0]["article"]["slug"] == article5.slug
-    assert articles[0]["article"]["title"] == article5.title
-    assert articles[0]["article"]["description"] == article5.description
-    assert articles[0]["article"]["body"] == article5.body
-    assert articles[0]["article"]["tagList"] == article5.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[0]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[0]["article"]["updatedAt"])
+    assert articles[0]["slug"] == article5.slug
+    assert articles[0]["title"] == article5.title
+    assert articles[0]["description"] == article5.description
+    assert articles[0]["body"] == article5.body
+    assert articles[0]["tagList"] == article5.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[0]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[0]["updatedAt"])
     assert created_at == article5.created_at
     assert updated_at == article5.updated_at
-    assert not articles[0]["article"]["favorited"]
-    assert articles[0]["article"]["favoritesCount"] == 1
-    assert articles[0]["article"]["author"] == {
+    assert not articles[0]["favorited"]
+    assert articles[0]["favoritesCount"] == 1
+    assert articles[0]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": True,
     }
 
-    assert articles[1]["article"]["slug"] == article4.slug
-    assert articles[1]["article"]["title"] == article4.title
-    assert articles[1]["article"]["description"] == article4.description
-    assert articles[1]["article"]["body"] == article4.body
-    assert articles[1]["article"]["tagList"] == article4.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[1]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[1]["article"]["updatedAt"])
+    assert articles[1]["slug"] == article4.slug
+    assert articles[1]["title"] == article4.title
+    assert articles[1]["description"] == article4.description
+    assert articles[1]["body"] == article4.body
+    assert articles[1]["tagList"] == article4.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[1]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[1]["updatedAt"])
     assert created_at == article4.created_at
     assert updated_at == article4.updated_at
-    assert not articles[1]["article"]["favorited"]
-    assert articles[1]["article"]["favoritesCount"] == 1
-    assert articles[1]["article"]["author"] == {
+    assert not articles[1]["favorited"]
+    assert articles[1]["favoritesCount"] == 1
+    assert articles[1]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": True,
     }
 
-    assert articles[2]["article"]["slug"] == article3.slug
-    assert articles[2]["article"]["title"] == article3.title
-    assert articles[2]["article"]["description"] == article3.description
-    assert articles[2]["article"]["body"] == article3.body
-    assert articles[2]["article"]["tagList"] == article3.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[2]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[2]["article"]["updatedAt"])
+    assert articles[2]["slug"] == article3.slug
+    assert articles[2]["title"] == article3.title
+    assert articles[2]["description"] == article3.description
+    assert articles[2]["body"] == article3.body
+    assert articles[2]["tagList"] == article3.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[2]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[2]["updatedAt"])
     assert created_at == article3.created_at
     assert updated_at == article3.updated_at
-    assert articles[2]["article"]["favorited"]
-    assert articles[2]["article"]["favoritesCount"] == 2
-    assert articles[2]["article"]["author"] == {
+    assert articles[2]["favorited"]
+    assert articles[2]["favoritesCount"] == 2
+    assert articles[2]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
@@ -841,8 +841,8 @@ async def test_default_limit_should_be_20(
     assert len(articles) == default_limit
     assert articles_count == default_limit
 
-    assert articles[0]["article"]["slug"] == created_articles[-1].slug
-    assert articles[-1]["article"]["slug"] == created_articles[0].slug
+    assert articles[0]["slug"] == created_articles[-1].slug
+    assert articles[-1]["slug"] == created_articles[0].slug
 
 
 @pytest.mark.asyncio
@@ -916,54 +916,54 @@ async def test_when_token_is_not_sent_and_articles_are_favorited_and_authors_are
     assert len(articles) == limit
     assert articles_count == limit
 
-    assert articles[0]["article"]["slug"] == article4.slug
-    assert articles[0]["article"]["title"] == article4.title
-    assert articles[0]["article"]["description"] == article4.description
-    assert articles[0]["article"]["body"] == article4.body
-    assert articles[0]["article"]["tagList"] == article4.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[0]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[0]["article"]["updatedAt"])
+    assert articles[0]["slug"] == article4.slug
+    assert articles[0]["title"] == article4.title
+    assert articles[0]["description"] == article4.description
+    assert articles[0]["body"] == article4.body
+    assert articles[0]["tagList"] == article4.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[0]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[0]["updatedAt"])
     assert created_at == article4.created_at
     assert updated_at == article4.updated_at
-    assert not articles[0]["article"]["favorited"]
-    assert articles[0]["article"]["favoritesCount"] == 1
-    assert articles[0]["article"]["author"] == {
+    assert not articles[0]["favorited"]
+    assert articles[0]["favoritesCount"] == 1
+    assert articles[0]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": False,
     }
 
-    assert articles[1]["article"]["slug"] == article3.slug
-    assert articles[1]["article"]["title"] == article3.title
-    assert articles[1]["article"]["description"] == article3.description
-    assert articles[1]["article"]["body"] == article3.body
-    assert articles[1]["article"]["tagList"] == article3.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[1]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[1]["article"]["updatedAt"])
+    assert articles[1]["slug"] == article3.slug
+    assert articles[1]["title"] == article3.title
+    assert articles[1]["description"] == article3.description
+    assert articles[1]["body"] == article3.body
+    assert articles[1]["tagList"] == article3.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[1]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[1]["updatedAt"])
     assert created_at == article3.created_at
     assert updated_at == article3.updated_at
-    assert not articles[1]["article"]["favorited"]
-    assert articles[1]["article"]["favoritesCount"] == 2
-    assert articles[1]["article"]["author"] == {
+    assert not articles[1]["favorited"]
+    assert articles[1]["favoritesCount"] == 2
+    assert articles[1]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
         "following": False,
     }
 
-    assert articles[2]["article"]["slug"] == article2.slug
-    assert articles[2]["article"]["title"] == article2.title
-    assert articles[2]["article"]["description"] == article2.description
-    assert articles[2]["article"]["body"] == article2.body
-    assert articles[2]["article"]["tagList"] == article2.tag_list
-    created_at = datetime.datetime.fromisoformat(articles[2]["article"]["createdAt"])
-    updated_at = datetime.datetime.fromisoformat(articles[2]["article"]["updatedAt"])
+    assert articles[2]["slug"] == article2.slug
+    assert articles[2]["title"] == article2.title
+    assert articles[2]["description"] == article2.description
+    assert articles[2]["body"] == article2.body
+    assert articles[2]["tagList"] == article2.tag_list
+    created_at = datetime.datetime.fromisoformat(articles[2]["createdAt"])
+    updated_at = datetime.datetime.fromisoformat(articles[2]["updatedAt"])
     assert created_at == article2.created_at
     assert updated_at == article2.updated_at
-    assert not articles[2]["article"]["favorited"]
-    assert articles[2]["article"]["favoritesCount"] == 1
-    assert articles[2]["article"]["author"] == {
+    assert not articles[2]["favorited"]
+    assert articles[2]["favoritesCount"] == 1
+    assert articles[2]["author"] == {
         "username": author.username,
         "bio": author.bio,
         "image": author.image,
