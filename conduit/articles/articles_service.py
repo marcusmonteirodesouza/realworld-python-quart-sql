@@ -142,6 +142,12 @@ class ArticlesService:
             WHERE deleted_at IS NULL
         """
 
+        if limit is None:
+            limit = 20
+
+        if offset is None:
+            offset = 0
+
         query_params = {"limit": limit, "offset": offset}
 
         if tag:
