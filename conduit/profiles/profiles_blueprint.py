@@ -33,7 +33,7 @@ async def follow_user(username: str) -> (ProfileResponse, int):
     )
 
     return ProfileResponse(
-        ProfileResponseProfile(
+        profile=ProfileResponseProfile(
             username=profile.username,
             bio=profile.bio,
             image=profile.image,
@@ -65,7 +65,7 @@ async def get_profile(username: str) -> (ProfileResponse, int):
     )
 
     return ProfileResponse(
-        ProfileResponseProfile(
+        profile=ProfileResponseProfile(
             username=profile.username,
             bio=profile.bio,
             image=profile.image,
@@ -100,7 +100,7 @@ async def unfollow_user(username: str) -> (ProfileResponse, int):
     )
 
     return ProfileResponse(
-        ProfileResponseProfile(
+        profile=ProfileResponseProfile(
             username=profile.username,
             bio=profile.bio,
             image=profile.image,

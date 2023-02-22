@@ -3,7 +3,6 @@ import shortuuid
 from typing import List, Optional
 from slugify import slugify
 from .article import Article
-from .update_article_params import UpdateArticleParams
 from ..exceptions import NotFoundException
 
 
@@ -129,8 +128,87 @@ class ArticlesService:
                 favorites_count=favorites_count,
             )
 
+    async def list_articles(
+        self,
+        tag: Optional[str] = None,
+        author_id: Optional[str] = None,
+        is_favorited_by_user_id: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ) -> List[Article]:
+        list_articles_query = f"""
+            SELECT id, author_id, slug, title, description, body, tags, created_at, updated_at
+            FROM {self._articles_table} a
+            WHERE deleted_at IS NULL
+        """
+
+        query_params = {"limit": limit, "offset": offset}
+
+        if tag:
+            list_articles_query = f"{list_articles_query} AND %(tag)s = ANY (tags)"
+            query_params["tag"] = tag
+
+        if author_id:
+            list_articles_query = f"{list_articles_query} AND author_id = %(author_id)s"
+            query_params["author_id"] = author_id
+
+        if is_favorited_by_user_id:
+            list_articles_query = f"""
+                {list_articles_query}
+                AND EXISTS (
+                    SELECT 1 FROM {self._favorites_table} f
+                    WHERE f.article_id = a.id
+                    AND user_id = %(is_favorited_by_user_id)s
+                    AND deleted_at IS NULL
+                )
+            """
+            query_params["is_favorited_by_user_id"] = is_favorited_by_user_id
+
+        list_articles_query = f"""
+            {list_articles_query}
+            ORDER BY created_at DESC
+            LIMIT %(limit)s
+            OFFSET %(offset)s;
+        """
+
+        async with self._aconn.cursor() as acur:
+            await acur.execute(list_articles_query, query_params)
+
+            records = await acur.fetchall()
+
+            articles = []
+
+            for record in records:
+                article_id = record[0]
+
+                favorites_count = await self._get_favorites_count(
+                    acur=acur, article_id=article_id
+                )
+
+                article = Article(
+                    id=article_id,
+                    author_id=record[1],
+                    slug=record[2],
+                    title=record[3],
+                    description=record[4],
+                    body=record[5],
+                    tags=record[6],
+                    created_at=record[7],
+                    updated_at=record[8],
+                    favorites_count=favorites_count,
+                )
+
+                articles.append(article)
+
+            return articles
+
     async def update_article_by_id(
-        self, article_id: str, params: UpdateArticleParams
+        self,
+        article_id: str,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        body: Optional[str] = None,
+        tags: Optional[List[str]] = None,
     ) -> Article:
         article = await self.get_article_by_id(article_id=article_id)
 
@@ -143,7 +221,7 @@ class ArticlesService:
 
         query_params = {"id": article.id}
 
-        if params.title:
+        if title:
             if update_article_query == initial_update_article_query:
                 update_article_query = (
                     f"{update_article_query} SET title = %(title)s, slug = %(slug)s"
@@ -153,10 +231,10 @@ class ArticlesService:
                     f"{update_article_query}, title = %(title)s, slug = %(slug)s"
                 )
 
-            query_params["title"] = params.title
-            query_params["slug"] = self._slugify_title(title=params.title)
+            query_params["title"] = title
+            query_params["slug"] = self._slugify_title(title=title)
 
-        if params.description:
+        if description:
             if update_article_query == initial_update_article_query:
                 update_article_query = (
                     f"{update_article_query} SET description = %(description)s"
@@ -166,23 +244,23 @@ class ArticlesService:
                     f"{update_article_query}, description = %(description)s"
                 )
 
-            query_params["description"] = params.description
+            query_params["description"] = description
 
-        if params.body:
+        if body:
             if update_article_query == initial_update_article_query:
                 update_article_query = f"{update_article_query} SET body = %(body)s"
             else:
                 update_article_query = f"{update_article_query}, body = %(body)s"
 
-            query_params["body"] = params.body
+            query_params["body"] = body
 
-        if params.tags:
+        if tags:
             if update_article_query == initial_update_article_query:
                 update_article_query = f"{update_article_query} SET tags = %(tags)s"
             else:
                 update_article_query = f"{update_article_query}, tags = %(tags)s"
 
-            query_params["tags"] = self._slugify_tags(tags=params.tags)
+            query_params["tags"] = self._slugify_tags(tags=tags)
 
         async with self._aconn.cursor() as acur:
             if update_article_query != initial_update_article_query:
@@ -248,7 +326,7 @@ class ArticlesService:
 
         await self._aconn.commit()
 
-    async def is_favorite(self, article_id: str, user_id: str) -> bool:
+    async def is_favorited(self, article_id: str, user_id: str) -> bool:
         async with self._aconn.cursor() as acur:
             is_following_query = f"""
                 SELECT EXISTS(

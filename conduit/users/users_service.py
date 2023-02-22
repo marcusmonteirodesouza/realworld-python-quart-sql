@@ -2,7 +2,6 @@ import psycopg
 import validators
 from typing import Optional
 from werkzeug.security import generate_password_hash, check_password_hash
-from .update_user_params import UpdateUserParams
 from .user import User
 from ..exceptions import AlreadyExistsException
 
@@ -133,33 +132,41 @@ class UsersService:
 
         return user
 
-    async def update_user(self, user_id: str, params: UpdateUserParams):
+    async def update_user(
+        self,
+        user_id: str,
+        username: Optional[str] = None,
+        email: Optional[str] = None,
+        password: Optional[str] = None,
+        bio: Optional[str] = None,
+        image: Optional[str] = None,
+    ):
         initial_update_user_query = f"UPDATE {self._users_table}"
 
         update_user_query = initial_update_user_query
 
         query_params = {"id": user_id}
 
-        if params.username:
+        if username:
             if update_user_query == initial_update_user_query:
                 update_user_query = f"{update_user_query} SET username = %(username)s"
             else:
                 update_user_query = f"{update_user_query}, username = %(username)s"
 
-            query_params["username"] = params.username
+            query_params["username"] = username
 
-        if params.email:
-            self._validate_email(email=params.email)
+        if email:
+            self._validate_email(email=email)
 
             if update_user_query == initial_update_user_query:
                 update_user_query = f"{update_user_query} SET email = %(email)s"
             else:
                 update_user_query = f"{update_user_query}, email = %(email)s"
 
-            query_params["email"] = params.email
+            query_params["email"] = email
 
-        if params.password:
-            self._validate_password(params.password)
+        if password:
+            self._validate_password(password)
 
             if update_user_query == initial_update_user_query:
                 update_user_query = (
@@ -171,26 +178,26 @@ class UsersService:
                 )
 
             query_params["password_hash"] = self._generate_password_hash(
-                password=params.password
+                password=password
             )
 
-        if params.bio:
+        if bio:
             if update_user_query == initial_update_user_query:
                 update_user_query = f"{update_user_query} SET bio = %(bio)s"
             else:
                 update_user_query = f"{update_user_query}, bio = %(bio)s"
 
-            query_params["bio"] = params.bio
+            query_params["bio"] = bio
 
-        if params.image:
-            self._validate_image(image=params.image)
+        if image:
+            self._validate_image(image=image)
 
             if update_user_query == initial_update_user_query:
                 update_user_query = f"{update_user_query} SET image = %(image)s"
             else:
                 update_user_query = f"{update_user_query}, image = %(image)s"
 
-            query_params["image"] = params.image
+            query_params["image"] = image
 
         if update_user_query != initial_update_user_query:
             update_user_query = f"""

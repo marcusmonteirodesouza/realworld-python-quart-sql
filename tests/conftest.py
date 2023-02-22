@@ -2,7 +2,7 @@ import datetime
 import json
 import random
 import uuid
-from typing import Optional
+from typing import List, Optional
 
 import pytest
 import pytest_asyncio
@@ -177,7 +177,9 @@ async def get_profile_and_decode(app):
 
 @pytest_asyncio.fixture(scope="function")
 async def create_article_and_decode(app, faker):
-    async def _create_article_and_decode(author_token: str) -> Article:
+    async def _create_article_and_decode(
+        author_token: str, tags: Optional[List[str]] = None
+    ) -> Article:
         client = app.test_client()
 
         data = {
@@ -185,7 +187,7 @@ async def create_article_and_decode(app, faker):
                 "title": faker.sentence(),
                 "description": faker.sentence(),
                 "body": faker.paragraph(),
-                "tagList": faker.words(nb=10, unique=True),
+                "tagList": tags if tags else faker.words(nb=10, unique=True),
             }
         }
 
