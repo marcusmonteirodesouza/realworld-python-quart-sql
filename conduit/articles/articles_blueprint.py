@@ -1,6 +1,6 @@
 from http import HTTPStatus
 from quart import Blueprint, current_app, Response
-from quart_schema import validate_request, validate_response
+from quart_schema import validate_request, validate_querystring, validate_response
 
 from .article_response import (
     ArticleResponse,
@@ -8,10 +8,11 @@ from .article_response import (
     ArticleResponseArticleAuthorProfile,
 )
 from .create_article_request import CreateArticleRequest
-from .update_article_params import UpdateArticleParams
+from .list_articles_request_query_args import ListArticlesQueryArgs
+from .multiple_articles_response import MultipleArticlesResponse
 from .update_article_request import UpdateArticleRequest
 from ..auth import jwt_required, jwt_optional, get_jwt_identity
-from ..exceptions import UnauthorizedException
+from ..exceptions import UnauthorizedException, NotFoundException
 
 articles_blueprint = Blueprint("articles", __name__)
 
@@ -44,7 +45,7 @@ async def create_article(data: CreateArticleRequest) -> (ArticleResponse, int):
 
     return (
         ArticleResponse(
-            ArticleResponseArticle(
+            article=ArticleResponseArticle(
                 slug=article.slug,
                 title=article.title,
                 description=article.description,
@@ -66,6 +67,99 @@ async def create_article(data: CreateArticleRequest) -> (ArticleResponse, int):
     )
 
 
+@articles_blueprint.get(rule="/articles")
+@jwt_optional
+@validate_querystring(model_class=ListArticlesQueryArgs)
+@validate_response(model_class=MultipleArticlesResponse)
+async def list_articles(
+    query_args: ListArticlesQueryArgs,
+) -> (MultipleArticlesResponse, int):
+    username = get_jwt_identity()
+
+    if username:
+        current_user = await current_app.users_service.get_user_by_username(
+            username=username
+        )
+
+        if not current_user:
+            raise UnauthorizedException(f"user {username} not found")
+    else:
+        current_user = None
+
+    if query_args.author:
+        author = await current_app.users_service.get_user_by_username(
+            username=query_args.author
+        )
+        if not author:
+            raise NotFoundException(f"author {query_args.author} not found")
+        author_id = author.id
+    else:
+        author_id = None
+
+    if query_args.favorited:
+        is_favorited_by_user = await current_app.users_service.get_user_by_username(
+            username=query_args.favorited
+        )
+
+        if not is_favorited_by_user:
+            raise NotFoundException(
+                f"favorited by user {query_args.favorited} not found"
+            )
+        is_favorited_by_user_id = is_favorited_by_user.id
+    else:
+        is_favorited_by_user_id = None
+
+    articles = await current_app.articles_service.list_articles(
+        tag=query_args.tag,
+        author_id=author_id,
+        is_favorited_by_user_id=is_favorited_by_user_id,
+        limit=query_args.limit,
+        offset=query_args.offset,
+    )
+
+    article_responses = []
+    for article in articles:
+        if current_user:
+            is_favorited_by_current_user = (
+                await current_app.articles_service.is_favorited(
+                    article_id=article.id, user_id=current_user.id
+                )
+            )
+
+            author_profile = await current_app.profiles_service.get_profile_by_user_id(
+                user_id=article.author_id, follower_id=current_user.id
+            )
+        else:
+            is_favorited_by_current_user = False
+
+            author_profile = await current_app.profiles_service.get_profile_by_user_id(
+                user_id=article.author_id
+            )
+
+        article_response_article = ArticleResponseArticle(
+            slug=article.slug,
+            title=article.title,
+            description=article.description,
+            body=article.body,
+            tag_list=article.tags,
+            created_at=article.created_at,
+            updated_at=article.updated_at,
+            favorited=is_favorited_by_current_user,
+            favorites_count=article.favorites_count,
+            author=ArticleResponseArticleAuthorProfile(
+                username=author_profile.username,
+                bio=author_profile.bio,
+                image=author_profile.image,
+                following=author_profile.following,
+            ),
+        )
+        article_responses.append(article_response_article)
+
+    return MultipleArticlesResponse(
+        articles=article_responses, articles_count=len(article_responses)
+    )
+
+
 @articles_blueprint.get(rule="/articles/<slug>")
 @jwt_optional
 @validate_response(model_class=ArticleResponse)
@@ -80,7 +174,7 @@ async def get_article(slug: str) -> (ArticleResponse, int):
         if not user:
             raise UnauthorizedException(f"user {username} not found")
 
-        is_favorite = await current_app.articles_service.is_favorite(
+        is_favorite = await current_app.articles_service.is_favorited(
             article_id=article.id, user_id=user.id
         )
 
@@ -96,7 +190,7 @@ async def get_article(slug: str) -> (ArticleResponse, int):
 
     return (
         ArticleResponse(
-            ArticleResponseArticle(
+            article=ArticleResponseArticle(
                 slug=article.slug,
                 title=article.title,
                 description=article.description,
@@ -146,17 +240,15 @@ async def update_article(
 
     article = await current_app.articles_service.update_article_by_id(
         article_id=article.id,
-        params=UpdateArticleParams(
-            title=data.article.title,
-            description=data.article.description,
-            body=data.article.body,
-            tags=data.article.tag_list,
-        ),
+        title=data.article.title,
+        description=data.article.description,
+        body=data.article.body,
+        tags=data.article.tag_list,
     )
 
     return (
         ArticleResponse(
-            ArticleResponseArticle(
+            article=ArticleResponseArticle(
                 slug=article.slug,
                 title=article.title,
                 description=article.description,
@@ -234,7 +326,7 @@ async def favorite_article(slug: str) -> (ArticleResponse, int):
 
     return (
         ArticleResponse(
-            ArticleResponseArticle(
+            article=ArticleResponseArticle(
                 slug=article.slug,
                 title=article.title,
                 description=article.description,

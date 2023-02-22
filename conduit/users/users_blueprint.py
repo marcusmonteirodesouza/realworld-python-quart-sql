@@ -3,7 +3,6 @@ from quart import Blueprint, current_app, request
 from quart_schema import validate_request, validate_response
 from .login_request import LoginRequest
 from .register_user_request import RegisterUserRequest
-from .update_user_params import UpdateUserParams
 from .update_user_request import UpdateUserRequest
 from .user_response import UserResponse, UserResponseUser
 from ..auth import create_access_token, jwt_required, get_jwt_identity, get_jwt_token
@@ -32,7 +31,7 @@ async def register_user(data: RegisterUserRequest) -> (UserResponse, int):
 
     return (
         UserResponse(
-            UserResponseUser(
+            user=UserResponseUser(
                 username=user.username,
                 email=user.email,
                 token=token,
@@ -66,7 +65,7 @@ async def login(data: LoginRequest) -> (UserResponse, int):
 
     return (
         UserResponse(
-            UserResponseUser(
+            user=UserResponseUser(
                 username=user.username,
                 email=user.email,
                 token=token,
@@ -92,7 +91,7 @@ async def get_current_user() -> (UserResponse, int):
 
     return (
         UserResponse(
-            UserResponseUser(
+            user=UserResponseUser(
                 email=user.email,
                 token=token,
                 username=user.username,
@@ -121,13 +120,11 @@ async def update_user(data: UpdateUserRequest) -> (UserResponse, int):
 
     updated_user = await current_app.users_service.update_user(
         user_id=user.id,
-        params=UpdateUserParams(
-            username=data.user.username,
-            email=data.user.email,
-            password=data.user.password,
-            bio=data.user.bio,
-            image=data.user.image,
-        ),
+        username=data.user.username,
+        email=data.user.email,
+        password=data.user.password,
+        bio=data.user.bio,
+        image=data.user.image,
     )
 
     current_app.logger.info(f"user updated! {updated_user}")
@@ -136,7 +133,7 @@ async def update_user(data: UpdateUserRequest) -> (UserResponse, int):
 
     return (
         UserResponse(
-            UserResponseUser(
+            user=UserResponseUser(
                 username=updated_user.username,
                 email=updated_user.email,
                 token=token,
