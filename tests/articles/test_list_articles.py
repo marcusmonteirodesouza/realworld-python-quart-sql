@@ -977,11 +977,11 @@ async def test_when_token_has_invalid_signature_should_return_401(
 ):
     client = app.test_client()
 
-    author = await create_user_and_decode()
+    user = await create_user_and_decode()
 
     secret_key = secrets.token_urlsafe()
 
-    token = create_jwt(username=author.username, secret_key=secret_key)
+    token = create_jwt(username=user.username, secret_key=secret_key)
 
     response = await client.get(
         make_list_articles_url(),
@@ -1003,9 +1003,9 @@ async def test_when_token_is_expired_should_return_401(
 ):
     client = app.test_client()
 
-    author = await create_user_and_decode()
+    user = await create_user_and_decode()
 
-    token = create_jwt(username=author.username, expires_seconds=-1)
+    token = create_jwt(username=user.username, expires_seconds=-1)
 
     response = await client.get(
         make_list_articles_url(),

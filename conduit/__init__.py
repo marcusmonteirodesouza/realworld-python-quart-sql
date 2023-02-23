@@ -31,11 +31,15 @@ add_error_handlers(app=app)
 async def startup():
     app.aconn = await psycopg.AsyncConnection.connect(app.config["DATABASE_URI"])
 
-    app.users_service = UsersService(aconn=app.aconn)
-    app.profiles_service = ProfilesService(
-        aconn=app.aconn, users_service=app.users_service
+    users_service = UsersService(aconn=app.aconn)
+    profiles_service = ProfilesService(aconn=app.aconn, users_service=users_service)
+    articles_service = ArticlesService(
+        aconn=app.aconn, profiles_service=profiles_service
     )
-    app.articles_service = ArticlesService(aconn=app.aconn)
+
+    app.users_service = users_service
+    app.profiles_service = profiles_service
+    app.articles_service = articles_service
 
     app.register_blueprint(blueprint=users_blueprint)
     app.register_blueprint(blueprint=profiles_blueprint)

@@ -1,5 +1,5 @@
 import psycopg
-from typing import Optional
+from typing import List, Optional
 from .profile import Profile
 from .. import UsersService
 from ..exceptions import NotFoundException
@@ -20,6 +20,7 @@ class ProfilesService:
             raise NotFoundException(f"user {user_id} not found")
 
         profile = Profile(
+            user_id=user.id,
             username=user.username,
             bio=user.bio,
             image=user.image,
@@ -49,6 +50,30 @@ class ProfilesService:
         return await self.get_profile_by_user_id(
             user_id=user.id, follower_id=follower_id
         )
+
+    async def get_followed_profiles_by_user_id(self, follower_id: str) -> List[Profile]:
+        async with self._aconn.cursor() as acur:
+            follow_user_query = f"""
+                SELECT followed_id
+                FROM {self._follows_table}
+                WHERE follower_id = %s
+                AND deleted_at IS NULL;
+            """
+
+            await acur.execute(follow_user_query, (follower_id,))
+
+            records = await acur.fetchall()
+
+            profiles = []
+
+            for record in records:
+                followed_id = record[0]
+                profile = await self.get_profile_by_user_id(
+                    user_id=followed_id, follower_id=follower_id
+                )
+                profiles.append(profile)
+
+            return profiles
 
     async def follow_user_by_username(self, follower_id: str, followed_username: str):
         followed = await self._users_service.get_user_by_username(

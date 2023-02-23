@@ -3,12 +3,16 @@ import shortuuid
 from typing import List, Optional
 from slugify import slugify
 from .article import Article
+from .. import ProfilesService
 from ..exceptions import NotFoundException
 
 
 class ArticlesService:
-    def __init__(self, aconn: psycopg.AsyncConnection):
+    def __init__(
+        self, aconn: psycopg.AsyncConnection, profiles_service: ProfilesService
+    ):
         self._aconn = aconn
+        self._profiles_service = profiles_service
         self._articles_table = "articles"
         self._tags_table = "tags"
         self._articles_tags_table = "articles_tags"
@@ -132,7 +136,8 @@ class ArticlesService:
         self,
         tag: Optional[str] = None,
         author_id: Optional[str] = None,
-        is_favorited_by_user_id: Optional[str] = None,
+        articles_favorited_by_user_id: Optional[str] = None,
+        authors_followed_by_user_id: Optional[str] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
     ) -> List[Article]:
@@ -158,17 +163,34 @@ class ArticlesService:
             list_articles_query = f"{list_articles_query} AND author_id = %(author_id)s"
             query_params["author_id"] = author_id
 
-        if is_favorited_by_user_id:
+        if articles_favorited_by_user_id:
             list_articles_query = f"""
                 {list_articles_query}
                 AND EXISTS (
                     SELECT 1 FROM {self._favorites_table} f
                     WHERE f.article_id = a.id
-                    AND user_id = %(is_favorited_by_user_id)s
+                    AND user_id = %(articles_favorited_by_user_id)s
                     AND deleted_at IS NULL
                 )
             """
-            query_params["is_favorited_by_user_id"] = is_favorited_by_user_id
+            query_params[
+                "articles_favorited_by_user_id"
+            ] = articles_favorited_by_user_id
+
+        if authors_followed_by_user_id:
+            followed_authors = (
+                await self._profiles_service.get_followed_profiles_by_user_id(
+                    follower_id=authors_followed_by_user_id
+                )
+            )
+
+            list_articles_query = f"""
+                {list_articles_query}
+                AND author_id = ANY(%(followed_authors_ids)s)
+            """
+            query_params["followed_authors_ids"] = [
+                author.user_id for author in followed_authors
+            ]
 
         list_articles_query = f"""
             {list_articles_query}
