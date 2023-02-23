@@ -287,13 +287,11 @@ async def get_article_and_decode(get_article):
 
 @pytest_asyncio.fixture(scope="function")
 async def favorite_article_and_decode(app):
-    async def _favorite_article_and_decode(
-        user_token: str, article_slug: str
-    ) -> Article:
+    async def _favorite_article_and_decode(user_token: str, slug: str) -> Article:
         client = app.test_client()
 
         response = await client.post(
-            f"/articles/{article_slug}/favorite",
+            f"/articles/{slug}/favorite",
             headers={
                 "Authorization": f"Token {user_token}",
             },

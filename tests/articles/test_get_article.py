@@ -30,13 +30,9 @@ async def test_when_token_is_sent_and_article_is_favorited_and_author_is_followe
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
-    await favorite_article_and_decode(
-        user_token=user1.token, article_slug=created_article.slug
-    )
+    await favorite_article_and_decode(user_token=user1.token, slug=created_article.slug)
 
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=created_article.slug
-    )
+    await favorite_article_and_decode(user_token=user2.token, slug=created_article.slug)
 
     response = await client.get(
         make_get_article_url(slug=created_article.slug),
@@ -91,9 +87,7 @@ async def test_when_token_is_sent_and_article_is_not_favorited_and_author_is_fol
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=created_article.slug
-    )
+    await favorite_article_and_decode(user_token=user2.token, slug=created_article.slug)
 
     response = await client.get(
         make_get_article_url(slug=created_article.slug),
@@ -145,13 +139,9 @@ async def test_when_token_is_sent_and_article_is_favorited_and_author_is_not_fol
 
     created_article = await create_article_and_decode(author_token=author.token)
 
-    await favorite_article_and_decode(
-        user_token=user1.token, article_slug=created_article.slug
-    )
+    await favorite_article_and_decode(user_token=user1.token, slug=created_article.slug)
 
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=created_article.slug
-    )
+    await favorite_article_and_decode(user_token=user2.token, slug=created_article.slug)
 
     response = await client.get(
         make_get_article_url(slug=created_article.slug),
@@ -204,9 +194,7 @@ async def test_when_token_is_sent_and_article_is_not_favorited_and_author_is_not
 
     created_article = await create_article_and_decode(author_token=author.token)
 
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=created_article.slug
-    )
+    await favorite_article_and_decode(user_token=user2.token, slug=created_article.slug)
 
     response = await client.get(
         make_get_article_url(slug=created_article.slug),
@@ -259,9 +247,7 @@ async def test_when_token_is_not_sent_should_return_200(
 
     await follow_user_and_decode(follower_token=user.token, username=author.username)
 
-    await favorite_article_and_decode(
-        user_token=user.token, article_slug=created_article.slug
-    )
+    await favorite_article_and_decode(user_token=user.token, slug=created_article.slug)
 
     response = await client.get(
         make_get_article_url(slug=created_article.slug),

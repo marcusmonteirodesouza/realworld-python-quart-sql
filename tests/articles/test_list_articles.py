@@ -62,25 +62,13 @@ async def test_when_token_is_sent_and_articles_are_favorited_and_authors_are_fol
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
-    await favorite_article_and_decode(
-        user_token=user1.token, article_slug=article3.slug
-    )
+    await favorite_article_and_decode(user_token=user1.token, slug=article3.slug)
 
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article1.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article2.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article3.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article4.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article5.slug
-    )
+    await favorite_article_and_decode(user_token=user2.token, slug=article1.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article2.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article3.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article4.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article5.slug)
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
@@ -189,25 +177,13 @@ async def test_when_token_is_sent_and_articles_are_favorited_and_authors_are_fol
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
-    await favorite_article_and_decode(
-        user_token=user1.token, article_slug=article3.slug
-    )
+    await favorite_article_and_decode(user_token=user1.token, slug=article3.slug)
 
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article1.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article2.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article3.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article4.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article5.slug
-    )
+    await favorite_article_and_decode(user_token=user2.token, slug=article1.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article2.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article3.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article4.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article5.slug)
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
@@ -318,25 +294,13 @@ async def test_when_token_is_sent_and_articles_are_favorited_and_authors_are_fol
 
     await follow_user_and_decode(follower_token=user1.token, username=author1.username)
 
-    await favorite_article_and_decode(
-        user_token=user1.token, article_slug=article3.slug
-    )
+    await favorite_article_and_decode(user_token=user1.token, slug=article3.slug)
 
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article1.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article2.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article3.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article4.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article5.slug
-    )
+    await favorite_article_and_decode(user_token=user2.token, slug=article1.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article2.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article3.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article4.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article5.slug)
 
     await follow_user_and_decode(follower_token=user1.token, username=author1.username)
 
@@ -446,9 +410,7 @@ async def test_when_token_is_sent_and_articles_are_favorited_and_authors_are_fol
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
-    await favorite_article_and_decode(
-        user_token=user1.token, article_slug=article3.slug
-    )
+    await favorite_article_and_decode(user_token=user1.token, slug=article3.slug)
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
@@ -558,25 +520,13 @@ async def test_when_token_is_sent_and_articles_are_favorited_and_authors_are_fol
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
-    await favorite_article_and_decode(
-        user_token=user1.token, article_slug=article3.slug
-    )
+    await favorite_article_and_decode(user_token=user1.token, slug=article3.slug)
 
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article1.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article2.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article3.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article4.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article5.slug
-    )
+    await favorite_article_and_decode(user_token=user2.token, slug=article1.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article2.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article3.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article4.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article5.slug)
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
@@ -703,25 +653,13 @@ async def test_when_token_is_sent_and_articles_are_favorited_and_authors_are_fol
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
-    await favorite_article_and_decode(
-        user_token=user1.token, article_slug=article3.slug
-    )
+    await favorite_article_and_decode(user_token=user1.token, slug=article3.slug)
 
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article1.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article2.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article3.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article4.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article5.slug
-    )
+    await favorite_article_and_decode(user_token=user2.token, slug=article1.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article2.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article3.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article4.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article5.slug)
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
@@ -871,25 +809,13 @@ async def test_when_token_is_not_sent_and_articles_are_favorited_and_authors_are
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
-    await favorite_article_and_decode(
-        user_token=user1.token, article_slug=article3.slug
-    )
+    await favorite_article_and_decode(user_token=user1.token, slug=article3.slug)
 
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article1.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article2.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article3.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article4.slug
-    )
-    await favorite_article_and_decode(
-        user_token=user2.token, article_slug=article5.slug
-    )
+    await favorite_article_and_decode(user_token=user2.token, slug=article1.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article2.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article3.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article4.slug)
+    await favorite_article_and_decode(user_token=user2.token, slug=article5.slug)
 
     await follow_user_and_decode(follower_token=user1.token, username=author.username)
 
