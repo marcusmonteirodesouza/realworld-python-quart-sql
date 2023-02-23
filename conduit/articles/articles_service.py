@@ -354,6 +354,31 @@ class ArticlesService:
 
         await self._aconn.commit()
 
+    async def unfavorite_article_by_slug(self, slug: str, user_id: str):
+        article = await self.get_article_by_slug(slug=slug)
+
+        if not article:
+            raise NotFoundException(f"slug {slug} not found")
+
+        if not await self.is_favorited(article_id=article.id, user_id=user_id):
+            return
+
+        async with self._aconn.cursor() as acur:
+            unfavorite_article_query = f"""
+                UPDATE {self._favorites_table}
+                SET deleted_at = current_timestamp
+                WHERE article_id = %s
+                AND user_id = %s;
+            """
+
+            try:
+                await acur.execute(unfavorite_article_query, (article.id, user_id))
+            except Exception as e:
+                await self._aconn.rollback()
+                raise e
+
+        await self._aconn.commit()
+
     async def is_favorited(self, article_id: str, user_id: str) -> bool:
         async with self._aconn.cursor() as acur:
             is_following_query = f"""

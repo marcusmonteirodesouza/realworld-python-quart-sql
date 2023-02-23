@@ -54,7 +54,7 @@ async def test_when_all_query_args_are_set_should_return_200(
     await follow_user_and_decode(follower_token=user.token, username=author1.username)
     await follow_user_and_decode(follower_token=user.token, username=author2.username)
 
-    await favorite_article_and_decode(user_token=user.token, article_slug=article5.slug)
+    await favorite_article_and_decode(user_token=user.token, slug=article5.slug)
 
     limit = 3
     offset = 1
@@ -164,7 +164,7 @@ async def test_when_all_query_args_but_limit_are_set_should_return_200(
     await follow_user_and_decode(follower_token=user.token, username=author1.username)
     await follow_user_and_decode(follower_token=user.token, username=author2.username)
 
-    await favorite_article_and_decode(user_token=user.token, article_slug=article5.slug)
+    await favorite_article_and_decode(user_token=user.token, slug=article5.slug)
 
     offset = 1
 
@@ -308,7 +308,7 @@ async def test_when_all_query_args_but_offset_are_set_should_return_200(
     await follow_user_and_decode(follower_token=user.token, username=author1.username)
     await follow_user_and_decode(follower_token=user.token, username=author2.username)
 
-    await favorite_article_and_decode(user_token=user.token, article_slug=article5.slug)
+    await favorite_article_and_decode(user_token=user.token, slug=article5.slug)
 
     limit = 3
 
