@@ -8,6 +8,7 @@ from .article_response import (
     ArticleResponseArticleAuthorProfile,
 )
 from .create_article_request import CreateArticleRequest
+from .feed_articles_query_args import FeedArticlesQueryArgs
 from .list_articles_request_query_args import ListArticlesQueryArgs
 from .multiple_articles_response import MultipleArticlesResponse
 from .update_article_request import UpdateArticleRequest
@@ -97,22 +98,24 @@ async def list_articles(
         author_id = None
 
     if query_args.favorited:
-        is_favorited_by_user = await current_app.users_service.get_user_by_username(
-            username=query_args.favorited
+        articles_favorited_by_user = (
+            await current_app.users_service.get_user_by_username(
+                username=query_args.favorited
+            )
         )
 
-        if not is_favorited_by_user:
+        if not articles_favorited_by_user:
             raise NotFoundException(
                 f"favorited by user {query_args.favorited} not found"
             )
-        is_favorited_by_user_id = is_favorited_by_user.id
+        articles_favorited_by_user_id = articles_favorited_by_user.id
     else:
-        is_favorited_by_user_id = None
+        articles_favorited_by_user_id = None
 
     articles = await current_app.articles_service.list_articles(
         tag=query_args.tag,
         author_id=author_id,
-        is_favorited_by_user_id=is_favorited_by_user_id,
+        articles_favorited_by_user_id=articles_favorited_by_user_id,
         limit=query_args.limit,
         offset=query_args.offset,
     )
@@ -135,6 +138,62 @@ async def list_articles(
             author_profile = await current_app.profiles_service.get_profile_by_user_id(
                 user_id=article.author_id
             )
+
+        article_response_article = ArticleResponseArticle(
+            slug=article.slug,
+            title=article.title,
+            description=article.description,
+            body=article.body,
+            tag_list=article.tags,
+            created_at=article.created_at,
+            updated_at=article.updated_at,
+            favorited=is_favorited_by_current_user,
+            favorites_count=article.favorites_count,
+            author=ArticleResponseArticleAuthorProfile(
+                username=author_profile.username,
+                bio=author_profile.bio,
+                image=author_profile.image,
+                following=author_profile.following,
+            ),
+        )
+        article_responses.append(article_response_article)
+
+    return MultipleArticlesResponse(
+        articles=article_responses, articles_count=len(article_responses)
+    )
+
+
+@articles_blueprint.get(rule="/articles/feed")
+@jwt_required
+@validate_querystring(model_class=FeedArticlesQueryArgs)
+@validate_response(model_class=MultipleArticlesResponse)
+async def feed_articles(
+    query_args: ListArticlesQueryArgs,
+) -> (MultipleArticlesResponse, int):
+    username = get_jwt_identity()
+
+    current_user = await current_app.users_service.get_user_by_username(
+        username=username
+    )
+
+    if not current_user:
+        raise UnauthorizedException(f"user {username} not found")
+
+    articles = await current_app.articles_service.list_articles(
+        authors_followed_by_user_id=current_user.id,
+        limit=query_args.limit,
+        offset=query_args.offset,
+    )
+
+    article_responses = []
+    for article in articles:
+        is_favorited_by_current_user = await current_app.articles_service.is_favorited(
+            article_id=article.id, user_id=current_user.id
+        )
+
+        author_profile = await current_app.profiles_service.get_profile_by_user_id(
+            user_id=article.author_id, follower_id=current_user.id
+        )
 
         article_response_article = ArticleResponseArticle(
             slug=article.slug,
