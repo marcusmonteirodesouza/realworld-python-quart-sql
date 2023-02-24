@@ -41,3 +41,12 @@ CREATE TABLE IF NOT EXISTS favorites(
   deleted_at TIMESTAMP WITH TIME ZONE,
   UNIQUE(article_id, user_id)
 );
+
+CREATE TABLE IF NOT EXISTS comments(
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  article_id UUID references articles(id),
+  author_id UUID references users(id),
+  body TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp
+);

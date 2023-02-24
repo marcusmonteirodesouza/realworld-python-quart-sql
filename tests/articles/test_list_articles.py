@@ -784,7 +784,7 @@ async def test_default_limit_should_be_20(
 
 
 @pytest.mark.asyncio
-async def test_when_token_is_not_sent_and_articles_are_favorited_and_authors_are_followed_and_all_query_args_are_set_should_return_200(
+async def test_when_token_is_not_sent_should_return_200(
     app,
     faker,
     create_user_and_decode,

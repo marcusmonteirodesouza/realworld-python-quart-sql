@@ -2,6 +2,12 @@ from http import HTTPStatus
 from quart import Blueprint, current_app, Response
 from quart_schema import validate_request, validate_querystring, validate_response
 
+from .CommentResponse import (
+    CommentResponse,
+    CommentResponseComment,
+    CommentResponseAuthorProfile,
+)
+from .add_comment_request import AddCommentRequest
 from .article_response import (
     ArticleResponse,
     ArticleResponseArticle,
@@ -11,7 +17,16 @@ from .create_article_request import CreateArticleRequest
 from .feed_articles_query_args import FeedArticlesQueryArgs
 from .list_articles_request_query_args import ListArticlesQueryArgs
 from .list_of_tags_response import ListOfTagsResponse
-from .multiple_articles_response import MultipleArticlesResponse
+from .multiple_articles_response import (
+    MultipleArticlesResponse,
+    MultipleArticlesResponseArticle,
+    MultipleArticlesResponseAuthorProfile,
+)
+from .multiple_comments_response import (
+    MultipleCommentsResponse,
+    MultipleCommentsResponseComment,
+    MultipleCommentsResponseAuthorProfile,
+)
 from .update_article_request import UpdateArticleRequest
 from ..auth import jwt_required, jwt_optional, get_jwt_identity
 from ..exceptions import UnauthorizedException, NotFoundException
@@ -140,7 +155,7 @@ async def list_articles(
                 user_id=article.author_id
             )
 
-        article_response_article = ArticleResponseArticle(
+        article_response_article = MultipleArticlesResponseArticle(
             slug=article.slug,
             title=article.title,
             description=article.description,
@@ -150,7 +165,7 @@ async def list_articles(
             updated_at=article.updated_at,
             favorited=is_favorited_by_current_user,
             favorites_count=article.favorites_count,
-            author=ArticleResponseArticleAuthorProfile(
+            author=MultipleArticlesResponseAuthorProfile(
                 username=author_profile.username,
                 bio=author_profile.bio,
                 image=author_profile.image,
@@ -196,7 +211,7 @@ async def feed_articles(
             user_id=article.author_id, follower_id=current_user.id
         )
 
-        article_response_article = ArticleResponseArticle(
+        article_response_article = MultipleArticlesResponseArticle(
             slug=article.slug,
             title=article.title,
             description=article.description,
@@ -206,7 +221,7 @@ async def feed_articles(
             updated_at=article.updated_at,
             favorited=is_favorited_by_current_user,
             favorites_count=article.favorites_count,
-            author=ArticleResponseArticleAuthorProfile(
+            author=MultipleArticlesResponseAuthorProfile(
                 username=author_profile.username,
                 bio=author_profile.bio,
                 image=author_profile.image,
@@ -463,3 +478,94 @@ async def unfavorite_article(slug: str) -> (ArticleResponse, int):
             )
         ),
     )
+
+
+@articles_blueprint.post(rule="/articles/<slug>/comments")
+@jwt_required
+@validate_request(model_class=AddCommentRequest)
+@validate_response(model_class=CommentResponse, status_code=HTTPStatus.CREATED)
+async def add_comment_to_article(
+    slug: str, data: AddCommentRequest
+) -> (CommentResponse, int):
+    author_username = get_jwt_identity()
+
+    author = await current_app.users_service.get_user_by_username(
+        username=author_username
+    )
+
+    if not author:
+        raise UnauthorizedException(f"author {author_username} not found")
+
+    current_app.logger.info(
+        f"received add comment request. author_id: {author.id}, data: {data}"
+    )
+
+    comment = await current_app.articles_service.add_comment_to_article_by_slug(
+        slug=slug, author_id=author.id, body=data.comment.body
+    )
+
+    return (
+        CommentResponse(
+            comment=CommentResponseComment(
+                id=str(comment.id),
+                body=comment.body,
+                created_at=comment.created_at,
+                updated_at=comment.updated_at,
+                author=CommentResponseAuthorProfile(
+                    username=author.username,
+                    bio=author.bio,
+                    image=author.image,
+                    following=False,
+                ),
+            )
+        ),
+        HTTPStatus.CREATED,
+    )
+
+
+@articles_blueprint.get(rule="/articles/<slug>/comments")
+@jwt_optional
+@validate_response(model_class=MultipleCommentsResponse)
+async def list_comments_from_article(slug: str) -> (MultipleCommentsResponse, int):
+    username = get_jwt_identity()
+
+    if username:
+        current_user = await current_app.users_service.get_user_by_username(
+            username=username
+        )
+
+        if not current_user:
+            raise UnauthorizedException(f"user {username} not found")
+    else:
+        current_user = None
+
+    comments = await current_app.articles_service.list_article_comments_by_slug(
+        slug=slug
+    )
+
+    comment_responses = []
+    for comment in comments:
+        if current_user:
+            author_profile = await current_app.profiles_service.get_profile_by_user_id(
+                user_id=comment.author_id, follower_id=current_user.id
+            )
+        else:
+            author_profile = await current_app.profiles_service.get_profile_by_user_id(
+                user_id=comment.author_id
+            )
+
+        comment_response_comment = MultipleCommentsResponseComment(
+            id=str(comment.id),
+            body=comment.body,
+            created_at=comment.created_at,
+            updated_at=comment.updated_at,
+            author=MultipleCommentsResponseAuthorProfile(
+                username=author_profile.username,
+                bio=author_profile.bio,
+                image=author_profile.image,
+                following=author_profile.following,
+            ),
+        )
+        comment_responses.append(comment_response_comment)
+
+    return MultipleCommentsResponse(comments=comment_responses)

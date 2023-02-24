@@ -1,1 +1,1 @@
-from .article import Article, AuthorProfile
+from .article import Article, ArticleAuthorProfile
