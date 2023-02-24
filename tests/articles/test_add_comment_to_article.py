@@ -87,6 +87,36 @@ async def test_when_article_is_not_found_should_return_404(
 
 
 @pytest.mark.asyncio
+async def test_when_token_is_not_sent_should_return_401(
+    app,
+    faker,
+    create_user_and_decode,
+    create_article_and_decode,
+):
+    client = app.test_client()
+
+    author = await create_user_and_decode()
+
+    article = await create_article_and_decode(author_token=author.token)
+
+    data = {"comment": {"body": faker.paragraph()}}
+
+    response = await client.post(
+        make_add_comment_to_article_url(slug=article.slug),
+        data=json.dumps(data),
+        headers={
+            "Content-Type": "application/json",
+        },
+    )
+
+    assert response.status_code == 401
+
+    response_data = await response.json
+
+    assert response_data["errors"]["body"][0] == "unauthorized"
+
+
+@pytest.mark.asyncio
 async def test_when_authorization_header_has_invalid_scheme_should_return_401(
     app, faker, create_user_and_decode, create_article_and_decode
 ):

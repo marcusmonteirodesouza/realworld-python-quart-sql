@@ -497,7 +497,7 @@ async def add_comment_to_article(
         raise UnauthorizedException(f"author {author_username} not found")
 
     current_app.logger.info(
-        f"received add comment request. author_id: {author.id}, data: {data}"
+        f"received add comment to article request. author_id: {author.id}, slug: {slug}, data: {data}"
     )
 
     comment = await current_app.articles_service.add_comment_to_article_by_slug(
@@ -569,3 +569,35 @@ async def list_comments_from_article(slug: str) -> (MultipleCommentsResponse, in
         comment_responses.append(comment_response_comment)
 
     return MultipleCommentsResponse(comments=comment_responses)
+
+
+@articles_blueprint.delete(rule="/articles/<slug>/comments/<comment_id>")
+@jwt_required
+async def delete_comment_from_article(slug: str, comment_id: str):
+    author_username = get_jwt_identity()
+
+    author = await current_app.users_service.get_user_by_username(
+        username=author_username
+    )
+
+    if not author:
+        raise UnauthorizedException(f"author {author_username} not found")
+
+    current_app.logger.info(
+        f"received delete comment from article request. author_id: {author.id}, slug: {slug}, comment_id: {comment_id}"
+    )
+
+    comment = await current_app.articles_service.get_comment_by_id(
+        comment_id=comment_id
+    )
+
+    if author.id != comment.author_id:
+        raise UnauthorizedException(
+            f"author {author.id} not authorized to delete comment {comment.id}"
+        )
+
+    await current_app.articles_service.delete_comment_from_article_by_slug(
+        slug=slug, comment_id=comment_id
+    )
+
+    return Response(status=HTTPStatus.NO_CONTENT)

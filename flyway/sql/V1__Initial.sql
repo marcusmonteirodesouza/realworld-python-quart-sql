@@ -48,5 +48,6 @@ CREATE TABLE IF NOT EXISTS comments(
   author_id UUID references users(id),
   body TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
-  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
+  deleted_at TIMESTAMP WITH TIME ZONE
 );

@@ -339,7 +339,8 @@ class ArticlesService:
         async with self._aconn.cursor() as acur:
             get_tags_query = f"""
                 SELECT array_agg(DISTINCT t)
-                FROM {self._articles_table}, UNNEST(tags) as t;
+                FROM {self._articles_table}, UNNEST(tags) as t
+                WHERE deleted_at IS NULL;
             """
 
             await acur.execute(get_tags_query)
@@ -450,6 +451,35 @@ class ArticlesService:
 
         return comment
 
+    async def get_comment_by_id(self, comment_id: str) -> Optional[Comment]:
+        async with self._aconn.cursor() as acur:
+            get_article_comments_by_slug = f"""
+                        SELECT article_id, author_id, body, created_at, updated_at
+                        FROM {self._comments_table}
+                        WHERE id = %s
+                        AND deleted_at IS NULL;
+                    """
+
+            try:
+                await acur.execute(get_article_comments_by_slug, (comment_id,))
+            except Exception as e:
+                await self._aconn.rollback()
+                raise e
+
+            record = await acur.fetchone()
+
+            if not record:
+                return None
+
+            return Comment(
+                id=comment_id,
+                article_id=record[0],
+                author_id=record[1],
+                body=record[2],
+                created_at=record[3],
+                updated_at=record[4],
+            )
+
     async def list_article_comments_by_slug(self, slug: str) -> List[Comment]:
         article = await self.get_article_by_slug(slug=slug)
 
@@ -461,6 +491,7 @@ class ArticlesService:
                 SELECT id, author_id, body, created_at, updated_at
                 FROM {self._comments_table}
                 WHERE article_id = %s
+                AND deleted_at IS NULL
                 ORDER BY created_at DESC;
             """
 
@@ -486,6 +517,34 @@ class ArticlesService:
                 comments.append(comment)
 
             return comments
+
+    async def delete_comment_from_article_by_slug(self, slug: str, comment_id: str):
+        article = await self.get_article_by_slug(slug=slug)
+
+        if not article:
+            raise NotFoundException(f"slug {slug} not found")
+
+        async with self._aconn.cursor() as acur:
+            delete_comment_from_article_query = f"""
+                UPDATE {self._comments_table}
+                SET deleted_at = current_timestamp
+                WHERE id = %s
+                AND article_id = %s;
+            """
+
+            try:
+                await acur.execute(
+                    delete_comment_from_article_query,
+                    (
+                        comment_id,
+                        article.id,
+                    ),
+                )
+            except Exception as e:
+                await self._aconn.rollback()
+                raise e
+
+        await self._aconn.commit()
 
     async def _get_favorites_count(self, acur: psycopg.AsyncCursor, article_id) -> int:
         get_favorites_count_query = f"""

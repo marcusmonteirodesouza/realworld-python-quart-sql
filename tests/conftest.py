@@ -367,3 +367,51 @@ async def add_comment_to_article_and_decode(app, faker):
         )
 
     yield _add_comment_to_article_and_decode
+
+
+@pytest_asyncio.fixture(scope="function")
+async def list_comments_from_article_and_decode(app):
+    async def _list_comments_from_article_and_decode(
+        slug: str, user_token: Optional[str]
+    ) -> List[Comment]:
+        client = app.test_client()
+
+        headers = {}
+
+        if user_token:
+            headers["Authorization"] = (f"Token {user_token}",)
+
+        response = await client.get(
+            f"/articles/{slug}/comments",
+            headers=headers,
+        )
+
+        assert response.status_code == 200
+
+        response_data = await response.json
+
+        comments_data = response_data["comments"]
+
+        comments = []
+
+        for comment_data in comments_data:
+            author_data = comment_data["author"]
+
+            comment = Comment(
+                id=comment_data["id"],
+                body=comment_data["body"],
+                created_at=datetime.datetime.fromisoformat(comment_data["createdAt"]),
+                updated_at=datetime.datetime.fromisoformat(comment_data["updatedAt"]),
+                author=CommentAuthorProfile(
+                    username=author_data["username"],
+                    bio=author_data["bio"],
+                    image=author_data["image"],
+                    following=author_data["following"],
+                ),
+            )
+
+            comments.append(comment)
+
+        return comments
+
+    yield _list_comments_from_article_and_decode
