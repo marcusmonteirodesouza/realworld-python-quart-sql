@@ -332,6 +332,19 @@ class ArticlesService:
 
         await self._aconn.commit()
 
+    async def get_tags(self) -> List[str]:
+        async with self._aconn.cursor() as acur:
+            get_tags_query = f"""
+                SELECT array_agg(DISTINCT t)
+                FROM {self._articles_table}, UNNEST(tags) as t;
+            """
+
+            await acur.execute(get_tags_query)
+
+            records = await acur.fetchall()
+
+            return records[0][0]
+
     async def favorite_article_by_slug(self, slug: str, user_id: str):
         article = await self.get_article_by_slug(slug=slug)
 
