@@ -1,10 +1,10 @@
 import datetime
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 
 
 @dataclass
-class ArticleAuthorProfile:
+class CommentResponseAuthorProfile:
     username: str
     following: bool
     bio: Optional[str] = None
@@ -12,14 +12,14 @@ class ArticleAuthorProfile:
 
 
 @dataclass
-class Article:
-    slug: str
-    title: str
-    description: str
+class CommentResponseComment:
+    id: str
     body: str
-    tag_list: List[str]
     created_at: datetime.datetime
     updated_at: datetime.datetime
-    favorited: bool
-    favorites_count: int
-    author: ArticleAuthorProfile
+    author: CommentResponseAuthorProfile
+
+
+@dataclass
+class CommentResponse:
+    comment: CommentResponseComment

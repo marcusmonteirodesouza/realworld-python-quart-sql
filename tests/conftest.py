@@ -8,9 +8,10 @@ import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
 
+from .articles.comment import Comment, CommentAuthorProfile
 from .profiles import Profile
 from .users import User
-from .articles import Article, AuthorProfile
+from .articles import Article, ArticleAuthorProfile
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -218,7 +219,7 @@ async def create_article_and_decode(app, faker):
             updated_at=datetime.datetime.fromisoformat(article_data["updatedAt"]),
             favorited=article_data["favorited"],
             favorites_count=article_data["favoritesCount"],
-            author=AuthorProfile(
+            author=ArticleAuthorProfile(
                 username=author_data["username"],
                 bio=author_data["bio"],
                 image=author_data["image"],
@@ -274,7 +275,7 @@ async def get_article_and_decode(get_article):
             updated_at=datetime.datetime.fromisoformat(article_data["updatedAt"]),
             favorited=article_data["favorited"],
             favorites_count=article_data["favoritesCount"],
-            author=AuthorProfile(
+            author=ArticleAuthorProfile(
                 username=author_data["username"],
                 bio=author_data["bio"],
                 image=author_data["image"],
@@ -315,7 +316,7 @@ async def favorite_article_and_decode(app):
             updated_at=datetime.datetime.fromisoformat(article_data["updatedAt"]),
             favorited=article_data["favorited"],
             favorites_count=article_data["favoritesCount"],
-            author=AuthorProfile(
+            author=ArticleAuthorProfile(
                 username=author_data["username"],
                 bio=author_data["bio"],
                 image=author_data["image"],
@@ -324,3 +325,93 @@ async def favorite_article_and_decode(app):
         )
 
     yield _favorite_article_and_decode
+
+
+@pytest_asyncio.fixture(scope="function")
+async def add_comment_to_article_and_decode(app, faker):
+    async def _add_comment_to_article_and_decode(
+        author_token: str, slug: str
+    ) -> Comment:
+        client = app.test_client()
+
+        data = {"comment": {"body": faker.paragraph()}}
+
+        response = await client.post(
+            f"/articles/{slug}/comments",
+            data=json.dumps(data),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Token {author_token}",
+            },
+        )
+
+        assert response.status_code == 201
+
+        response_data = await response.json
+
+        comment_data = response_data["comment"]
+
+        author_data = comment_data["author"]
+
+        return Comment(
+            id=comment_data["id"],
+            body=comment_data["body"],
+            created_at=datetime.datetime.fromisoformat(comment_data["createdAt"]),
+            updated_at=datetime.datetime.fromisoformat(comment_data["updatedAt"]),
+            author=CommentAuthorProfile(
+                username=author_data["username"],
+                bio=author_data["bio"],
+                image=author_data["image"],
+                following=author_data["following"],
+            ),
+        )
+
+    yield _add_comment_to_article_and_decode
+
+
+@pytest_asyncio.fixture(scope="function")
+async def list_comments_from_article_and_decode(app):
+    async def _list_comments_from_article_and_decode(
+        slug: str, user_token: Optional[str]
+    ) -> List[Comment]:
+        client = app.test_client()
+
+        headers = {}
+
+        if user_token:
+            headers["Authorization"] = (f"Token {user_token}",)
+
+        response = await client.get(
+            f"/articles/{slug}/comments",
+            headers=headers,
+        )
+
+        assert response.status_code == 200
+
+        response_data = await response.json
+
+        comments_data = response_data["comments"]
+
+        comments = []
+
+        for comment_data in comments_data:
+            author_data = comment_data["author"]
+
+            comment = Comment(
+                id=comment_data["id"],
+                body=comment_data["body"],
+                created_at=datetime.datetime.fromisoformat(comment_data["createdAt"]),
+                updated_at=datetime.datetime.fromisoformat(comment_data["updatedAt"]),
+                author=CommentAuthorProfile(
+                    username=author_data["username"],
+                    bio=author_data["bio"],
+                    image=author_data["image"],
+                    following=author_data["following"],
+                ),
+            )
+
+            comments.append(comment)
+
+        return comments
+
+    yield _list_comments_from_article_and_decode
