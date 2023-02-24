@@ -10,6 +10,7 @@ from .article_response import (
 from .create_article_request import CreateArticleRequest
 from .feed_articles_query_args import FeedArticlesQueryArgs
 from .list_articles_request_query_args import ListArticlesQueryArgs
+from .list_of_tags_response import ListOfTagsResponse
 from .multiple_articles_response import MultipleArticlesResponse
 from .update_article_request import UpdateArticleRequest
 from ..auth import jwt_required, jwt_optional, get_jwt_identity
@@ -354,6 +355,14 @@ async def delete_article(slug: str):
     await current_app.articles_service.delete_article_by_id(article_id=article.id)
 
     return Response(status=HTTPStatus.NO_CONTENT)
+
+
+@articles_blueprint.get(rule="/tags")
+@validate_response(model_class=ListOfTagsResponse)
+async def get_tags() -> (ListOfTagsResponse, int):
+    tags = await current_app.articles_service.get_tags()
+
+    return ListOfTagsResponse(tags=tags)
 
 
 @articles_blueprint.post(rule="/articles/<slug>/favorite")
