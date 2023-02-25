@@ -5,7 +5,7 @@ from ..utils import create_jwt
 
 
 def make_get_profile_url(username: str) -> str:
-    return f"/profiles/{username}"
+    return f"/api/profiles/{username}"
 
 
 @pytest.mark.asyncio

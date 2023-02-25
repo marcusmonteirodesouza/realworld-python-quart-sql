@@ -8,7 +8,7 @@ from .user_response import UserResponse, UserResponseUser
 from ..auth import create_access_token, jwt_required, get_jwt_identity, get_jwt_token
 from ..exceptions import UnauthorizedException
 
-users_blueprint = Blueprint("users", __name__)
+users_blueprint = Blueprint("users", __name__, url_prefix="/api")
 
 
 @users_blueprint.post(rule="/users")

@@ -5,6 +5,10 @@ import pytest
 import jwt
 
 
+def make_register_user_url():
+    return "/api/users"
+
+
 @pytest.mark.asyncio
 async def test_should_return_201(app, faker):
     client = app.test_client()
@@ -18,7 +22,9 @@ async def test_should_return_201(app, faker):
     }
 
     response = await client.post(
-        "/users", data=json.dumps(data), headers={"Content-Type": "application/json"}
+        make_register_user_url(),
+        data=json.dumps(data),
+        headers={"Content-Type": "application/json"},
     )
 
     assert response.status_code == 201
@@ -58,7 +64,9 @@ async def test_when_username_not_sent_should_return_400(app, faker):
     }
 
     response = await client.post(
-        "/users", data=json.dumps(data), headers={"Content-Type": "application/json"}
+        make_register_user_url(),
+        data=json.dumps(data),
+        headers={"Content-Type": "application/json"},
     )
 
     assert response.status_code == 400
@@ -88,7 +96,9 @@ async def test_when_username_is_taken_should_return_422(
     }
 
     response = await client.post(
-        "/users", data=json.dumps(data), headers={"Content-Type": "application/json"}
+        make_register_user_url(),
+        data=json.dumps(data),
+        headers={"Content-Type": "application/json"},
     )
 
     assert response.status_code == 422
@@ -110,7 +120,9 @@ async def test_when_email_not_sent_should_return_400(app, faker):
     }
 
     response = await client.post(
-        "/users", data=json.dumps(data), headers={"Content-Type": "application/json"}
+        make_register_user_url(),
+        data=json.dumps(data),
+        headers={"Content-Type": "application/json"},
     )
 
     assert response.status_code == 400
@@ -136,7 +148,9 @@ async def test_when_invalid_email_should_return_422(app, faker):
     }
 
     response = await client.post(
-        "/users", data=json.dumps(data), headers={"Content-Type": "application/json"}
+        make_register_user_url(),
+        data=json.dumps(data),
+        headers={"Content-Type": "application/json"},
     )
 
     assert response.status_code == 422
@@ -165,7 +179,9 @@ async def test_when_email_is_taken_should_return_422(
     }
 
     response = await client.post(
-        "/users", data=json.dumps(data), headers={"Content-Type": "application/json"}
+        make_register_user_url(),
+        data=json.dumps(data),
+        headers={"Content-Type": "application/json"},
     )
 
     assert response.status_code == 422
@@ -188,7 +204,9 @@ async def test_when_password_is_too_short_should_return_422(app, faker):
     }
 
     response = await client.post(
-        "/users", data=json.dumps(data), headers={"Content-Type": "application/json"}
+        make_register_user_url(),
+        data=json.dumps(data),
+        headers={"Content-Type": "application/json"},
     )
 
     assert response.status_code == 422
@@ -214,7 +232,9 @@ async def test_when_password_is_too_long_should_return_422(app, faker):
     }
 
     response = await client.post(
-        "/users", data=json.dumps(data), headers={"Content-Type": "application/json"}
+        make_register_user_url(),
+        data=json.dumps(data),
+        headers={"Content-Type": "application/json"},
     )
 
     assert response.status_code == 422

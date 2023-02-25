@@ -8,6 +8,10 @@ import validators
 from ..utils import create_jwt
 
 
+def make_create_article_url():
+    return "/api/articles"
+
+
 @pytest.mark.asyncio
 async def test_should_return_201(app, faker, create_user_and_decode):
     client = app.test_client()
@@ -31,7 +35,7 @@ async def test_should_return_201(app, faker, create_user_and_decode):
     }
 
     response = await client.post(
-        "/articles",
+        make_create_article_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -98,7 +102,7 @@ async def test_when_creating_article_with_same_title_as_an_existing_one_should_r
     }
 
     response = await client.post(
-        "/articles",
+        make_create_article_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -137,7 +141,7 @@ async def test_when_tagList_is_not_sent_should_return_201(
     }
 
     response = await client.post(
-        "/articles",
+        make_create_article_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -183,7 +187,7 @@ async def test_when_article_is_not_sent_should_return_400(
     data = {}
 
     response = await client.post(
-        "/articles",
+        make_create_article_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -218,7 +222,7 @@ async def test_when_title_is_not_sent_should_return_400(
     }
 
     response = await client.post(
-        "/articles",
+        make_create_article_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -253,7 +257,7 @@ async def test_when_description_is_not_sent_should_return_400(
     }
 
     response = await client.post(
-        "/articles",
+        make_create_article_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -288,7 +292,7 @@ async def test_when_body_is_not_sent_should_return_400(
     }
 
     response = await client.post(
-        "/articles",
+        make_create_article_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -324,7 +328,7 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_401(
     }
 
     response = await client.post(
-        "/articles",
+        make_create_article_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -361,7 +365,7 @@ async def test_when_token_has_invalid_signature_should_return_401(
     token = create_jwt(username=author.username, secret_key=secret_key)
 
     response = await client.post(
-        "/articles",
+        make_create_article_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -396,7 +400,7 @@ async def test_when_token_is_expired_should_return_401(
     token = create_jwt(username=author.username, expires_seconds=-1)
 
     response = await client.post(
-        "/articles",
+        make_create_article_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -427,7 +431,7 @@ async def test_when_author_is_not_found_should_return_401(app, faker):
     token = create_jwt(username=str(uuid.uuid4()))
 
     response = await client.post(
-        "/articles",
+        make_create_article_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",

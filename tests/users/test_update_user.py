@@ -3,6 +3,11 @@ import json
 import secrets
 import uuid
 from ..utils import create_jwt
+from .test_login import make_login_url
+
+
+def make_update_user_url():
+    return "/api/user"
 
 
 @pytest.mark.asyncio
@@ -31,7 +36,7 @@ async def test_when_all_fields_set_should_return_200(
     }
 
     update_user_response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(update_user_data),
         headers={
             "Content-Type": "application/json",
@@ -40,7 +45,7 @@ async def test_when_all_fields_set_should_return_200(
     )
 
     login_response = await client.post(
-        "/users/login",
+        make_login_url(),
         data=json.dumps(login_data),
         headers={"Content-Type": "application/json"},
     )
@@ -75,7 +80,7 @@ async def test_when_username_is_set_should_return_200(
     }
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -111,7 +116,7 @@ async def test_when_username_is_taken_should_return_422(app, create_user_and_dec
     }
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -139,7 +144,7 @@ async def test_when_email_is_set_should_return_200(app, faker, create_user_and_d
     }
 
     update_user_response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(update_user_data),
         headers={
             "Content-Type": "application/json",
@@ -164,7 +169,7 @@ async def test_when_email_is_set_should_return_200(app, faker, create_user_and_d
     }
 
     login_response = await client.post(
-        "/users/login",
+        make_login_url(),
         data=json.dumps(login_data),
         headers={"Content-Type": "application/json"},
     )
@@ -185,7 +190,7 @@ async def test_when_email_is_invalid_should_return_422(app, create_user_and_deco
     }
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -217,7 +222,7 @@ async def test_when_email_is_taken_should_return_422(app, create_user_and_decode
     }
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -247,7 +252,7 @@ async def test_when_password_is_set_should_return_200(
     }
 
     update_user_response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(update_user_data),
         headers={
             "Content-Type": "application/json",
@@ -272,7 +277,7 @@ async def test_when_password_is_set_should_return_200(
     }
 
     login_response = await client.post(
-        "/users/login",
+        make_login_url(),
         data=json.dumps(login_data),
         headers={"Content-Type": "application/json"},
     )
@@ -295,7 +300,7 @@ async def test_when_password_is_too_short_should_return_422(
     }
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -328,7 +333,7 @@ async def test_when_password_is_too_long_should_return_422(
     }
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -359,7 +364,7 @@ async def test_when_bio_is_set_should_return_200(app, faker, create_user_and_dec
     }
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -393,7 +398,7 @@ async def test_when_image_is_set_should_return_200(app, faker, create_user_and_d
     }
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -427,7 +432,7 @@ async def test_when_image_is_invalid_should_return_422(app, create_user_and_deco
     }
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(data),
         headers={
             "Content-Type": "application/json",
@@ -449,7 +454,7 @@ async def test_when_image_is_invalid_should_return_422(app, create_user_and_deco
 async def test_when_authorization_header_is_not_set_should_return_401(app):
     client = app.test_client()
 
-    response = await client.put("/user")
+    response = await client.put(make_update_user_url())
 
     assert response.status_code == 401
 
@@ -467,7 +472,7 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_401(
     user = await create_user_and_decode()
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         headers={"Authorization": f"Bearer {user.token}"},
     )
 
@@ -491,7 +496,7 @@ async def test_when_token_has_invalid_signature_should_return_401(
     token = create_jwt(username=user.username, secret_key=secret_key)
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         headers={"Authorization": f"Token {token}"},
     )
 
@@ -511,7 +516,7 @@ async def test_when_token_is_expired_should_return_401(app, create_user_and_deco
     token = create_jwt(username=user.username, expires_seconds=-1)
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         headers={"Authorization": f"Token {token}"},
     )
 
@@ -539,7 +544,7 @@ async def test_when_user_is_not_found_should_return_401(app, faker):
     }
 
     response = await client.put(
-        "/user",
+        make_update_user_url(),
         data=json.dumps(data),
         headers={"Content-Type": "application/json", "Authorization": f"Token {token}"},
     )

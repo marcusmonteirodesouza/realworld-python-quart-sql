@@ -8,7 +8,7 @@ from ..utils import create_jwt
 
 
 def make_update_article_url(slug: str) -> str:
-    return f"/articles/{slug}"
+    return f"/api/articles/{slug}"
 
 
 @pytest.mark.asyncio

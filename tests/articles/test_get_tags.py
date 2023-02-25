@@ -3,7 +3,7 @@ import uuid
 
 
 def make_get_tags_url() -> str:
-    return "/tags"
+    return "/api/tags"
 
 
 @pytest.mark.asyncio

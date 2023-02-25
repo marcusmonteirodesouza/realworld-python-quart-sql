@@ -1,5 +1,5 @@
 import psycopg
-from quart import Quart
+from quart import Quart, Blueprint
 from quart_jwt_extended import JWTManager
 from quart_schema import QuartSchema
 from .users import UsersService, users_blueprint

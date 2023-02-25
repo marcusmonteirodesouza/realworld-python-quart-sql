@@ -46,7 +46,7 @@ async def create_user_and_decode(app, faker):
         }
 
         register_user_response = await client.post(
-            "/users",
+            "/api/users",
             data=json.dumps(register_user_data),
             headers={"Content-Type": "application/json"},
         )
@@ -65,7 +65,7 @@ async def create_user_and_decode(app, faker):
         }
 
         update_user_response = await client.put(
-            "/user",
+            "/api/user",
             data=json.dumps(update_user_data),
             headers={
                 "Content-Type": "application/json",
@@ -97,7 +97,7 @@ async def follow_user_and_decode(app):
         client = app.test_client()
 
         response = await client.post(
-            f"/profiles/{username}/follow",
+            f"/api/profiles/{username}/follow",
             headers={"Authorization": f"Token {follower_token}"},
         )
 
@@ -123,7 +123,7 @@ async def unfollow_user_and_decode(app):
         client = app.test_client()
 
         response = await client.delete(
-            f"/profiles/{username}/follow",
+            f"/api/profiles/{username}/follow",
             headers={"Authorization": f"Token {follower_token}"},
         )
 
@@ -156,7 +156,7 @@ async def get_profile_and_decode(app):
             headers["Authorization"] = f"Token {follower_token}"
 
         response = await client.get(
-            f"/profiles/{username}",
+            f"/api/profiles/{username}",
             headers=headers,
         )
 
@@ -193,7 +193,7 @@ async def create_article_and_decode(app, faker):
         }
 
         response = await client.post(
-            "/articles",
+            "/api/articles",
             data=json.dumps(data),
             headers={
                 "Authorization": f"Token {author_token}",
@@ -241,7 +241,7 @@ async def get_article(app):
             headers["Authorization"] = f"Token {user_token}"
 
         response = await client.get(
-            f"/articles/{slug}",
+            f"/api/articles/{slug}",
             headers=headers,
         )
 
@@ -292,7 +292,7 @@ async def favorite_article_and_decode(app):
         client = app.test_client()
 
         response = await client.post(
-            f"/articles/{slug}/favorite",
+            f"/api/articles/{slug}/favorite",
             headers={
                 "Authorization": f"Token {user_token}",
             },
@@ -337,7 +337,7 @@ async def add_comment_to_article_and_decode(app, faker):
         data = {"comment": {"body": faker.paragraph()}}
 
         response = await client.post(
-            f"/articles/{slug}/comments",
+            f"/api/articles/{slug}/comments",
             data=json.dumps(data),
             headers={
                 "Content-Type": "application/json",
@@ -382,7 +382,7 @@ async def list_comments_from_article_and_decode(app):
             headers["Authorization"] = (f"Token {user_token}",)
 
         response = await client.get(
-            f"/articles/{slug}/comments",
+            f"/api/articles/{slug}/comments",
             headers=headers,
         )
 
