@@ -64,6 +64,7 @@ It will require that you install [Node.js](https://nodejs.org/en/download/).
 
 ## [Google Cloud](https://cloud.google.com/)
 
-### Bootstrap
+### Pre-requisites
 
-### Deployment
+1. Install [terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+2. Install [openssl](https://www.openssl.org/)
