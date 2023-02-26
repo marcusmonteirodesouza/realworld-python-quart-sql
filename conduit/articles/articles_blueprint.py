@@ -31,7 +31,7 @@ from .update_article_request import UpdateArticleRequest
 from ..auth import jwt_required, jwt_optional, get_jwt_identity
 from ..exceptions import UnauthorizedException, NotFoundException
 
-articles_blueprint = Blueprint("articles", __name__)
+articles_blueprint = Blueprint("articles", __name__, url_prefix="/api")
 
 
 @articles_blueprint.post(rule="/articles")

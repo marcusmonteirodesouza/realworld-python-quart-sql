@@ -4,7 +4,7 @@ from .profile_response import ProfileResponse, ProfileResponseProfile
 from ..auth import jwt_required, jwt_optional, get_jwt_identity
 from ..exceptions import UnauthorizedException
 
-profiles_blueprint = Blueprint("profiles", __name__)
+profiles_blueprint = Blueprint("profiles", __name__, url_prefix="/api")
 
 
 @profiles_blueprint.post(rule="/profiles/<username>/follow")

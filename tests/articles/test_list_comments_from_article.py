@@ -6,7 +6,7 @@ from ..utils import create_jwt
 
 
 def make_list_comments_from_article_url(slug: str):
-    return f"/articles/{slug}/comments"
+    return f"/api/articles/{slug}/comments"
 
 
 @pytest.mark.asyncio

@@ -16,4 +16,4 @@ RUN pip install --upgrade pip && \
 FROM python:3.10-slim
 COPY --from=build-env /app /app
 WORKDIR /app
-CMD /app/.venv/bin/hypercorn conduit:app --bind "0.0.0.0:$PORT" --access-logfile "-" --error-logfile "-"
+CMD /app/.venv/bin/hypercorn conduit:app --bind "0.0.0.0:$PORT" --debug --access-logfile "-" --error-logfile "-"

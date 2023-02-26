@@ -7,7 +7,7 @@ from ..utils import create_jwt
 
 
 def make_add_comment_to_article_url(slug: str) -> str:
-    return f"/articles/{slug}/comments"
+    return f"/api/articles/{slug}/comments"
 
 
 @pytest.mark.asyncio

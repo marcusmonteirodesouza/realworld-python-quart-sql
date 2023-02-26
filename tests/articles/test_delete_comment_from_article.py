@@ -4,7 +4,7 @@ from ..utils import create_jwt
 
 
 def make_delete_comment_from_article_url(slug: str, comment_id: str):
-    return f"/articles/{slug}/comments/{comment_id}"
+    return f"/api/articles/{slug}/comments/{comment_id}"
 
 
 @pytest.mark.asyncio

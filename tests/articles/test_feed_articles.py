@@ -21,7 +21,7 @@ def make_feed_articles_url(
 
     encoded_params = urllib.parse.urlencode(params)
 
-    return f"/articles/feed?{encoded_params}"
+    return f"/api/articles/feed?{encoded_params}"
 
 
 @pytest.mark.asyncio

@@ -3,6 +3,10 @@ import secrets
 from ..utils import create_jwt
 
 
+def make_get_current_user_url():
+    return "/api/user"
+
+
 @pytest.mark.asyncio
 async def test_should_return_200(app, faker, create_user_and_decode):
     client = app.test_client()
@@ -10,7 +14,7 @@ async def test_should_return_200(app, faker, create_user_and_decode):
     user = await create_user_and_decode()
 
     response = await client.get(
-        "/user",
+        make_get_current_user_url(),
         headers={"Authorization": f"Token {user.token}"},
     )
 
@@ -31,7 +35,7 @@ async def test_should_return_200(app, faker, create_user_and_decode):
 async def test_when_authorization_header_is_not_set_should_return_401(app, faker):
     client = app.test_client()
 
-    response = await client.get("/user")
+    response = await client.get(make_get_current_user_url())
 
     assert response.status_code == 401
 
@@ -49,7 +53,7 @@ async def test_when_authorization_header_has_invalid_scheme_should_return_401(
     user = await create_user_and_decode()
 
     response = await client.get(
-        "/user",
+        make_get_current_user_url(),
         headers={"Authorization": f"Bearer {user.token}"},
     )
 
@@ -73,7 +77,7 @@ async def test_when_token_has_invalid_signature_should_return_401(
     token = create_jwt(username=user.username, secret_key=secret_key)
 
     response = await client.get(
-        "/user",
+        make_get_current_user_url(),
         headers={"Authorization": f"Token {token}"},
     )
 
@@ -95,7 +99,7 @@ async def test_when_token_is_expired_should_return_401(
     token = create_jwt(username=user.username, expires_seconds=-1)
 
     response = await client.get(
-        "/user",
+        make_get_current_user_url(),
         headers={"Authorization": f"Token {token}"},
     )
 
@@ -113,7 +117,7 @@ async def test_when_user_is_not_found_should_return_401(app, faker):
     token = create_jwt(username=faker.user_name())
 
     response = await client.get(
-        "/user",
+        make_get_current_user_url(),
         headers={"Authorization": f"Token {token}"},
     )
 

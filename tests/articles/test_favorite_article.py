@@ -6,7 +6,7 @@ from ..utils import create_jwt
 
 
 def make_favorite_article_url(slug: str) -> str:
-    return f"/articles/{slug}/favorite"
+    return f"/api/articles/{slug}/favorite"
 
 
 @pytest.mark.asyncio

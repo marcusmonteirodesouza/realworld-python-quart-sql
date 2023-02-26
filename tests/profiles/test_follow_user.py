@@ -5,7 +5,7 @@ from ..utils import create_jwt
 
 
 def make_follow_user_url(username: str) -> str:
-    return f"/profiles/{username}/follow"
+    return f"/api/profiles/{username}/follow"
 
 
 @pytest.mark.asyncio

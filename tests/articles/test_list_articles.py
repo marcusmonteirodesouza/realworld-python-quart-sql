@@ -33,7 +33,7 @@ def make_list_articles_url(
 
     encoded_params = urllib.parse.urlencode(params)
 
-    return f"/articles?{encoded_params}"
+    return f"/api/articles?{encoded_params}"
 
 
 @pytest.mark.asyncio

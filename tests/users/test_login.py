@@ -5,6 +5,10 @@ import pytest
 import jwt
 
 
+def make_login_url():
+    return "/api/users/login"
+
+
 @pytest.mark.asyncio
 async def test_should_return_200(app, faker, create_user_and_decode):
     client = app.test_client()
@@ -19,7 +23,7 @@ async def test_should_return_200(app, faker, create_user_and_decode):
     }
 
     response = await client.post(
-        "/users/login",
+        make_login_url(),
         data=json.dumps(data),
         headers={"Content-Type": "application/json"},
     )
@@ -64,7 +68,7 @@ async def test_when_email_is_not_sent_should_return_400(
     }
 
     response = await client.post(
-        "/users/login",
+        make_login_url(),
         data=json.dumps(data),
         headers={"Content-Type": "application/json"},
     )
@@ -95,7 +99,7 @@ async def test_when_email_is_not_found_should_return_401(
     }
 
     response = await client.post(
-        "/users/login",
+        make_login_url(),
         data=json.dumps(data),
         headers={"Content-Type": "application/json"},
     )
@@ -122,7 +126,7 @@ async def test_when_password_is_not_sent_should_return_400(
     }
 
     response = await client.post(
-        "/users/login",
+        make_login_url(),
         data=json.dumps(data),
         headers={"Content-Type": "application/json"},
     )
@@ -153,7 +157,7 @@ async def test_when_password_is_incorrect_should_return_401(
     }
 
     response = await client.post(
-        "/users/login",
+        make_login_url(),
         data=json.dumps(data),
         headers={"Content-Type": "application/json"},
     )
