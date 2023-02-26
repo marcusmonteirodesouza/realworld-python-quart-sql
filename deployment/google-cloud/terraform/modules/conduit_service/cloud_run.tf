@@ -1,14 +1,10 @@
 locals {
-  default_compute_sa_email = "${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+  default_compute_sa_email = "${var.project_number}-compute@developer.gserviceaccount.com"
 
   secret_ids = [
     google_secret_manager_secret.database_uri.secret_id,
     google_secret_manager_secret.secret_key.secret_id,
   ]
-}
-
-data "google_project" "project" {
-  project_id = var.project_id
 }
 
 resource "random_password" "secret_key" {

@@ -6,12 +6,6 @@ locals {
   migrations_dir_sha1 = sha1(join("", [for f in fileset(local.migrations_dir, "*") : filesha1("${local.migrations_dir}/${f}")]))
 }
 
-data "google_compute_zones" "available" {
-  project = var.project_id
-  region  = var.region
-  status  = "UP"
-}
-
 resource "random_password" "database_user" {
   length  = 32
   special = false
@@ -28,7 +22,7 @@ module "postgresql_database" {
   project_id           = var.project_id
   random_instance_name = true
   region               = var.region
-  zone                 = data.google_compute_zones.available.names[0]
+  zone                 = "${var.region}-a"
   tier                 = "db-f1-micro"
   user_name            = random_password.database_user.result
 

@@ -10,6 +10,7 @@ module "conduit_service" {
   source = "./modules/conduit_service"
 
   project_id                              = module.project.project_id
+  project_number                          = module.project.project_number
   region                                  = var.region
   domain                                  = var.domain
   postgresql_database_authorized_networks = var.postgresql_database_authorized_networks

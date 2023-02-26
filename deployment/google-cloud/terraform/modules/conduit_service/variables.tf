@@ -3,6 +3,11 @@ variable "project_id" {
   description = "The project ID."
 }
 
+variable "project_number" {
+  type        = string
+  description = "The numeric identifier of the project."
+}
+
 variable "region" {
   type        = string
   description = "The default Google Cloud region in which resources will be created at."
