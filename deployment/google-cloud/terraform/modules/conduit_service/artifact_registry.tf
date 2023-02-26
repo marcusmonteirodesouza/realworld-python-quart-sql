@@ -8,7 +8,7 @@ resource "google_artifact_registry_repository" "conduit" {
 
 resource "null_resource" "docker_build_and_push" {
   triggers = {
-    dir_sha1 = local.dir_sha1
+    conduit_image = local.conduit_image
   }
 
   provisioner "local-exec" {

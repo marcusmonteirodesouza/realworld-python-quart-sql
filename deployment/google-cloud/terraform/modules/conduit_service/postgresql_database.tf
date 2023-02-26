@@ -103,7 +103,7 @@ resource "null_resource" "sslkey" {
 # Migrations
 resource "null_resource" "run_migrations" {
   triggers = {
-    migrations_dir_sha1 = local.migrations_dir_sha1
+    commit_sha = local.commit_sha
   }
 
   provisioner "local-exec" {
