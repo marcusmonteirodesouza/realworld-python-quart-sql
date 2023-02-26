@@ -345,9 +345,9 @@ class ArticlesService:
 
             await acur.execute(get_tags_query)
 
-            records = await acur.fetchall()
+            record = await acur.fetchone()
 
-            return records[0][0]
+            return record[0] if record[0] is not None else []
 
     async def favorite_article_by_slug(self, slug: str, user_id: str):
         article = await self.get_article_by_slug(slug=slug)
